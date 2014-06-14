@@ -3,6 +3,7 @@ import json
 import time
 from urllib.request import urlopen
 import curses
+import argparse
 
 class Colors:
     STANDART        = 1
@@ -12,10 +13,11 @@ class Colors:
 
 
 class Monitor:
-    def __init__(self):
+    def __init__(self, args):
         self.stdscr = curses.initscr()
         (self.stdscr_height, self.stdscr_width) = self.stdscr.getmaxyx()
         self.main_window = curses.newwin(self.stdscr_height, self.stdscr_width)
+        self.godname = args.god_name
 
         curses.noecho()
         curses.cbreak()
@@ -40,7 +42,7 @@ class Monitor:
         previous_state = None
 
         while(True):
-            connection = urlopen('http://godville.net/gods/api/GODNAME.json')
+            connection = urlopen('http://godville.net/gods/api/{0}.json'.format(self.godname))
             state = json.loads(connection.read().decode('utf-8'))
             #pprint.pprint(state)
             self.main_window.addstr(10, 5, '{0}'.format(state['name']), curses.color_pair(Colors.STANDART))
@@ -51,7 +53,11 @@ class Monitor:
             time.sleep(10)
 
 def main():
-    monitor = Monitor()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('god_name', help = 'Name of the god to me monitored')
+    args = parser.parse_args()
+
+    monitor = Monitor(args)
     monitor.main_loop()
 
 
