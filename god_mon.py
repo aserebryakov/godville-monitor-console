@@ -19,6 +19,7 @@ class Monitor:
         self.main_window = curses.newwin(self.stdscr_height, self.stdscr_width)
         self.main_window.box()
         self.godname = args.god_name
+        self.dump_file = args.dump
 
         curses.noecho()
         curses.cbreak()
@@ -44,14 +45,36 @@ class Monitor:
         self.main_window.addstr(y + 2, x, 'Power {0}'.format(state['godpower']), curses.color_pair(Colors.POWER_POINTS))
         self.main_window.addstr(y + 3, x, 'Inventory items {0}'.format(len(state['inventory'])), curses.color_pair(Colors.STANDART))
 
+    def read_state(self):
+        state = None
+        if self.dump_file != None:
+            state = self.read_dump(self.dump_file).decode('utf-8')
+        else:
+            state = self.read_form_url('http://godville.net/gods/api/{0}.json'.format(self.godname))
+        #pprint.pprint(state)
+        return state
+
+    def read_form_url(self, url):
+        connection = urlopen(url)
+        return connection.read().decode('utf-8')
+
+    def read_dump(self, dumpfile):
+        state = None
+        try:
+            f = open(dumpfile, 'rb')
+            state = f.read()
+            f.close()
+        except:
+            print('Error occured')
+
+        return state
+
     def main_loop(self):
         state = None
         previous_state = None
 
         while(True):
-            connection = urlopen('http://godville.net/gods/api/{0}.json'.format(self.godname))
-            state = json.loads(connection.read().decode('utf-8'))
-            #pprint.pprint(state)
+            state = json.loads(self.read_state())
             self.print_state(state, 1, 1)
             self.main_window.refresh()
             time.sleep(10)
@@ -59,6 +82,7 @@ class Monitor:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('god_name', help = 'Name of the god to me monitored')
+    parser.add_argument('-d', '--dump', type=str, help = 'read state from the dump (debug option)')
     args = parser.parse_args()
 
     monitor = Monitor(args)
