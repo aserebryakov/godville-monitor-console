@@ -46,11 +46,12 @@ class Monitor:
         curses.init_pair(Colors.HEALTH_POINTS, curses.COLOR_RED, curses.COLOR_BLACK)
         curses.init_pair(Colors.POWER_POINTS, curses.COLOR_BLUE, curses.COLOR_BLACK)
 
-    def print_state(self, state, y, x):
-        self.status_window.addstr(y, x, '{0}'.format(state['name']), curses.color_pair(Colors.STANDART))
-        self.status_window.addstr(y + 1, x, 'HP {0}'.format(state['health']), curses.color_pair(Colors.HEALTH_POINTS))
-        self.status_window.addstr(y + 2, x, 'Power {0}'.format(state['godpower']), curses.color_pair(Colors.POWER_POINTS))
-        self.status_window.addstr(y + 3, x, 'Inventory items {0}'.format(len(state['inventory'])), curses.color_pair(Colors.STANDART))
+    def update_state_window(self, state):
+        self.status_window.addstr(0, 7, 'State')
+        self.status_window.addstr(1, 1, '{0}'.format(state['name']), curses.color_pair(Colors.STANDART))
+        self.status_window.addstr(2, 1, 'HP {0}'.format(state['health']), curses.color_pair(Colors.HEALTH_POINTS))
+        self.status_window.addstr(3, 1, 'Power {0}'.format(state['godpower']), curses.color_pair(Colors.POWER_POINTS))
+        self.status_window.addstr(4, 1, 'Inventory items {0}'.format(len(state['inventory'])), curses.color_pair(Colors.STANDART))
 
     def read_state(self):
         state = None
@@ -82,7 +83,7 @@ class Monitor:
 
         while(True):
             state = json.loads(self.read_state())
-            self.print_state(state, 1, 1)
+            self.update_state_window(state)
             self.main_window.refresh()
             time.sleep(10)
 
