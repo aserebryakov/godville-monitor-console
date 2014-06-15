@@ -17,6 +17,7 @@ class Monitor:
         self.stdscr = curses.initscr()
         (self.stdscr_height, self.stdscr_width) = self.stdscr.getmaxyx()
         self.main_window = curses.newwin(self.stdscr_height, self.stdscr_width)
+        self.main_window.box()
         self.godname = args.god_name
 
         curses.noecho()
@@ -37,6 +38,12 @@ class Monitor:
         curses.init_pair(Colors.HEALTH_POINTS, curses.COLOR_RED, curses.COLOR_BLACK)
         curses.init_pair(Colors.POWER_POINTS, curses.COLOR_BLUE, curses.COLOR_BLACK)
 
+    def print_state(self, state, y, x):
+        self.main_window.addstr(y, x, '{0}'.format(state['name']), curses.color_pair(Colors.STANDART))
+        self.main_window.addstr(y + 1, x, 'HP {0}'.format(state['health']), curses.color_pair(Colors.HEALTH_POINTS))
+        self.main_window.addstr(y + 2, x, 'Power {0}'.format(state['godpower']), curses.color_pair(Colors.POWER_POINTS))
+        self.main_window.addstr(y + 3, x, 'Inventory items {0}'.format(len(state['inventory'])), curses.color_pair(Colors.STANDART))
+
     def main_loop(self):
         state = None
         previous_state = None
@@ -45,10 +52,7 @@ class Monitor:
             connection = urlopen('http://godville.net/gods/api/{0}.json'.format(self.godname))
             state = json.loads(connection.read().decode('utf-8'))
             #pprint.pprint(state)
-            self.main_window.addstr(10, 5, '{0}'.format(state['name']), curses.color_pair(Colors.STANDART))
-            self.main_window.addstr(11, 5, 'HP {0}'.format(state['health']), curses.color_pair(Colors.HEALTH_POINTS))
-            self.main_window.addstr(12, 5, 'Power {0}'.format(state['godpower']), curses.color_pair(Colors.POWER_POINTS))
-            self.main_window.addstr(13, 5, 'Inventory items {0}'.format(len(state['inventory'])), curses.color_pair(Colors.STANDART))
+            self.print_state(state, 1, 1)
             self.main_window.refresh()
             time.sleep(10)
 
