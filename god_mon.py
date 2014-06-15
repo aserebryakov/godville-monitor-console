@@ -14,16 +14,12 @@ class Colors:
 
 class Monitor:
     def __init__(self, args):
-        self.stdscr = curses.initscr()
-        (self.stdscr_height, self.stdscr_width) = self.stdscr.getmaxyx()
-        self.main_window = curses.newwin(self.stdscr_height, self.stdscr_width)
-        self.main_window.box()
+        self.init_windows()
         self.godname = args.god_name
         self.dump_file = args.dump
 
         curses.noecho()
         curses.cbreak()
-        self.stdscr.clear()
 
         if curses.has_colors() == True:
             curses.start_color()
@@ -34,16 +30,27 @@ class Monitor:
         curses.nocbreak()
         curses.endwin()
 
+    def init_windows(self):
+        self.stdscr = curses.initscr()
+        (self.stdscr_height, self.stdscr_width) = self.stdscr.getmaxyx()
+        self.stdscr.clear()
+
+        self.main_window = curses.newwin(self.stdscr_height, self.stdscr_width)
+        self.main_window.box()
+        (height, width) = self.main_window.getmaxyx()
+        self.status_window = self.main_window.subwin(20, 20, 1, 1)
+        self.status_window.box()
+
     def init_colors(self):
         curses.init_pair(Colors.STANDART, curses.COLOR_WHITE, curses.COLOR_BLACK)
         curses.init_pair(Colors.HEALTH_POINTS, curses.COLOR_RED, curses.COLOR_BLACK)
         curses.init_pair(Colors.POWER_POINTS, curses.COLOR_BLUE, curses.COLOR_BLACK)
 
     def print_state(self, state, y, x):
-        self.main_window.addstr(y, x, '{0}'.format(state['name']), curses.color_pair(Colors.STANDART))
-        self.main_window.addstr(y + 1, x, 'HP {0}'.format(state['health']), curses.color_pair(Colors.HEALTH_POINTS))
-        self.main_window.addstr(y + 2, x, 'Power {0}'.format(state['godpower']), curses.color_pair(Colors.POWER_POINTS))
-        self.main_window.addstr(y + 3, x, 'Inventory items {0}'.format(len(state['inventory'])), curses.color_pair(Colors.STANDART))
+        self.status_window.addstr(y, x, '{0}'.format(state['name']), curses.color_pair(Colors.STANDART))
+        self.status_window.addstr(y + 1, x, 'HP {0}'.format(state['health']), curses.color_pair(Colors.HEALTH_POINTS))
+        self.status_window.addstr(y + 2, x, 'Power {0}'.format(state['godpower']), curses.color_pair(Colors.POWER_POINTS))
+        self.status_window.addstr(y + 3, x, 'Inventory items {0}'.format(len(state['inventory'])), curses.color_pair(Colors.STANDART))
 
     def read_state(self):
         state = None
