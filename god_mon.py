@@ -13,6 +13,17 @@ class Colors:
 
 
 class MonitorWindow:
+    '''
+    Base class for all windows of the Godville Monitor
+
+    Properties:
+        window - Reference to curses window object
+
+    Methods:
+        update(state) - Virtual method to update window with a given state
+                        Must be implemented for each derived class
+    '''
+
     def __init__(self, parent_window, height, width, x, y):
         print(height, width)
         self._window = parent_window.subwin(height, width, x, y)
@@ -39,6 +50,16 @@ class StatusWindow(MonitorWindow):
         self._window.addstr(3, 1, 'Power {0}'.format(state['godpower']), curses.color_pair(Colors.POWER_POINTS))
         self._window.addstr(4, 1, 'Inventory items {0}'.format(len(state['inventory'])), curses.color_pair(Colors.STANDART))
 
+class QuestWindow(MonitorWindow):
+    def __init__(self, parent_window):
+        height = 5
+        width  = 20
+        super(QuestWindow, self).__init__(parent_window, height, width, 1, 21)
+
+    def update(self, state):
+        self._window.addstr(0, 7, 'Quest')
+        self._window.addstr(1, 1, '{0}'.format(state['quest']), curses.color_pair(Colors.STANDART))
+        self._window.addstr(2, 1, 'Progress {0}'.format(state['quest_progress']), curses.color_pair(Colors.STANDART))
 
 class MainWindow(MonitorWindow):
     def __init__(self, stdscr):
@@ -47,6 +68,7 @@ class MainWindow(MonitorWindow):
 
         self._subwindows = []
         self._subwindows.append(StatusWindow(self.window))
+        self._subwindows.append(QuestWindow(self.window))
 
     def update(self, state):
         for window in self._subwindows:
@@ -89,7 +111,6 @@ class Monitor:
             state = self.read_dump(self.dump_file).decode('utf-8')
         else:
             state = self.read_form_url('http://godville.net/gods/api/{0}.json'.format(self.godname))
-        #pprint.pprint(state)
         return state
 
     def read_form_url(self, url):
