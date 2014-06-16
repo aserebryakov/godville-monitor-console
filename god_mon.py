@@ -12,15 +12,25 @@ class Colors:
     ATTENTION       = 4
 
 
-class StatusWindow:
-    def __init__(self, base_window):
-        (height, width) = base_window.getmaxyx()
-        self._window = base_window.subwin(20, 20, 1, 1)
+class MonitorWindow:
+    def __init__(self, parent_window, height, width, x, y):
+        print(height, width)
+        self._window = parent_window.subwin(height, width, x, y)
         self._window.box()
 
     @property
     def window(self):
         return self._window
+
+    def update(self, state):
+        assert(False, 'Not implemented')
+
+
+class StatusWindow(MonitorWindow):
+    def __init__(self, parent_window):
+        height = 20
+        width  = 20
+        super(StatusWindow, self).__init__(parent_window, height, width, 1, 1)
 
     def update(self, state):
         self._window.addstr(0, 7, 'State')
@@ -30,24 +40,20 @@ class StatusWindow:
         self._window.addstr(4, 1, 'Inventory items {0}'.format(len(state['inventory'])), curses.color_pair(Colors.STANDART))
 
 
-class MainWindow:
+class MainWindow(MonitorWindow):
     def __init__(self, stdscr):
-        (stdscr_height, stdscr_width) = stdscr.getmaxyx()
-        self._window = curses.newwin(stdscr_height, stdscr_width)
-        self._window.box()
+        (height, width) = stdscr.getmaxyx()
+        super(MainWindow, self).__init__(stdscr, height, width, 0, 0)
 
         self._subwindows = []
         self._subwindows.append(StatusWindow(self.window))
-
-    @property
-    def window(self):
-        return self._window
 
     def update(self, state):
         for window in self._subwindows:
             window.update(state)
 
         self.window.refresh()
+
 
 class Monitor:
     def __init__(self, args):
