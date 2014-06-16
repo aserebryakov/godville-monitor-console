@@ -40,7 +40,7 @@ class MonitorWindow:
             self._window.addstr(i + 1,
                                 1,
                                 string_list[i][0],
-                                string_list[i][1])
+                                curses.color_pair(string_list[i][1]))
 
 class StatusWindow(MonitorWindow):
     def __init__(self, parent_window):
@@ -51,20 +51,20 @@ class StatusWindow(MonitorWindow):
     def update(self, state):
         self._window.addstr(0, 2, 'State')
 
-        state_text = [ (state['name'], curses.color_pair(Colors.STANDART)),
+        state_text = [ (state['name'], Colors.STANDART),
                        ('HP    {0}/{1}'.format(state['health'],
                                             state['max_health']),
-                        curses.color_pair(Colors.HEALTH_POINTS)),
+                        Colors.HEALTH_POINTS),
                        ('Power    {0}%'.format(state['godpower']),
-                         curses.color_pair(Colors.POWER_POINTS)),
+                         Colors.POWER_POINTS),
                        ('Level    {0}'.format(state['level']),
-                         curses.color_pair(Colors.STANDART)),
+                         Colors.STANDART),
                        ('EXP      {0}%'.format(state['exp_progress']),
-                        curses.color_pair(Colors.STANDART)),
+                        Colors.STANDART),
                        ('Town {0}'.format(state['town_name']),
-                        curses.color_pair(Colors.STANDART)),
+                        Colors.STANDART),
                        ('Distance {0}'.format(state['distance']),
-                        curses.color_pair(Colors.STANDART)) ]
+                        Colors.STANDART) ]
 
         self.add_strings(state_text)
 
@@ -78,11 +78,11 @@ class QuestWindow(MonitorWindow):
         self._window.addstr(0, 2, 'Quest')
 
         state_text = [ ('{0}'.format(state['quest']),
-                        curses.color_pair(Colors.STANDART)),
+                        Colors.STANDART),
                        ('Progress {0}'.format(state['quest_progress']),
-                        curses.color_pair(Colors.STANDART)),
+                        Colors.STANDART),
                        ('Field news:',
-                        curses.color_pair(Colors.STANDART)) ]
+                        Colors.STANDART) ]
 
         self.add_strings(state_text)
 
