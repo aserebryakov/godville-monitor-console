@@ -25,7 +25,6 @@ class MonitorWindow:
     '''
 
     def __init__(self, parent_window, height, width, x, y):
-        print(height, width)
         self._window = parent_window.subwin(height, width, x, y)
         self._window.box()
 
@@ -44,11 +43,13 @@ class StatusWindow(MonitorWindow):
         super(StatusWindow, self).__init__(parent_window, height, width, 1, 1)
 
     def update(self, state):
-        self._window.addstr(0, 7, 'State')
+        self._window.addstr(0, 2, 'State')
         self._window.addstr(1, 1, '{0}'.format(state['name']), curses.color_pair(Colors.STANDART))
-        self._window.addstr(2, 1, 'HP {0}'.format(state['health']), curses.color_pair(Colors.HEALTH_POINTS))
+        self._window.addstr(2, 1, 'HP {0}/{1}'.format(state['health'], state['max_health']), curses.color_pair(Colors.HEALTH_POINTS))
         self._window.addstr(3, 1, 'Power {0}'.format(state['godpower']), curses.color_pair(Colors.POWER_POINTS))
-        self._window.addstr(4, 1, 'Inventory items {0}'.format(len(state['inventory'])), curses.color_pair(Colors.STANDART))
+        self._window.addstr(4, 1, 'Level {0}'.format(state['level']), curses.color_pair(Colors.STANDART))
+        self._window.addstr(5, 1, 'EXP {0}%'.format(state['exp_progress']), curses.color_pair(Colors.STANDART))
+
 
 class QuestWindow(MonitorWindow):
     def __init__(self, parent_window):
@@ -57,9 +58,10 @@ class QuestWindow(MonitorWindow):
         super(QuestWindow, self).__init__(parent_window, height, width, 1, 21)
 
     def update(self, state):
-        self._window.addstr(0, 7, 'Quest')
+        self._window.addstr(0, 2, 'Quest')
         self._window.addstr(1, 1, '{0}'.format(state['quest']), curses.color_pair(Colors.STANDART))
         self._window.addstr(2, 1, 'Progress {0}'.format(state['quest_progress']), curses.color_pair(Colors.STANDART))
+
 
 class MainWindow(MonitorWindow):
     def __init__(self, stdscr):
