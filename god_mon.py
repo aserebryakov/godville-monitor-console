@@ -39,28 +39,92 @@ class MonitorWindow:
 class StatusWindow(MonitorWindow):
     def __init__(self, parent_window):
         height = 20
-        width  = 20
+        width  = 15
         super(StatusWindow, self).__init__(parent_window, height, width, 1, 1)
 
     def update(self, state):
         self._window.addstr(0, 2, 'State')
-        self._window.addstr(1, 1, '{0}'.format(state['name']), curses.color_pair(Colors.STANDART))
-        self._window.addstr(2, 1, 'HP {0}/{1}'.format(state['health'], state['max_health']), curses.color_pair(Colors.HEALTH_POINTS))
-        self._window.addstr(3, 1, 'Power {0}'.format(state['godpower']), curses.color_pair(Colors.POWER_POINTS))
-        self._window.addstr(4, 1, 'Level {0}'.format(state['level']), curses.color_pair(Colors.STANDART))
-        self._window.addstr(5, 1, 'EXP {0}%'.format(state['exp_progress']), curses.color_pair(Colors.STANDART))
+        self._window.addstr(1,
+                            1,
+                            state['name'],
+                            curses.color_pair(Colors.STANDART))
 
+        self._window.addstr(2,
+                            1,
+                            'HP    {0}/{1}'.format(state['health'],
+                                                state['max_health']),
+                            curses.color_pair(Colors.HEALTH_POINTS))
+
+        self._window.addstr(3,
+                            1,
+                            'Power    {0}%'.format(state['godpower']),
+                            curses.color_pair(Colors.POWER_POINTS))
+
+        self._window.addstr(4,
+                            1,
+                            'Level    {0}'.format(state['level']),
+                            curses.color_pair(Colors.STANDART))
+
+        self._window.addstr(5,
+                            1,
+                            'EXP      {0}%'.format(state['exp_progress']),
+                            curses.color_pair(Colors.STANDART))
+
+        self._window.addstr(6,
+                            1,
+                            'Town {0}'.format(state['town_name']),
+                            curses.color_pair(Colors.STANDART))
+
+        self._window.addstr(7,
+                            1,
+                            'Distance {0}'.format(state['distance']),
+                            curses.color_pair(Colors.STANDART))
 
 class QuestWindow(MonitorWindow):
     def __init__(self, parent_window):
-        height = 5
-        width  = 20
-        super(QuestWindow, self).__init__(parent_window, height, width, 1, 21)
+        height = 6
+        width  = 63
+        super(QuestWindow, self).__init__(parent_window, height, width, 1, 16)
 
     def update(self, state):
         self._window.addstr(0, 2, 'Quest')
-        self._window.addstr(1, 1, '{0}'.format(state['quest']), curses.color_pair(Colors.STANDART))
-        self._window.addstr(2, 1, 'Progress {0}'.format(state['quest_progress']), curses.color_pair(Colors.STANDART))
+
+        self._window.addstr(1,
+                            1,
+                            '{0}'.format(state['quest']),
+                            curses.color_pair(Colors.STANDART))
+
+        self._window.addstr(2,
+                            1,
+                            'Progress {0}'.format(state['quest_progress']),
+                            curses.color_pair(Colors.STANDART))
+
+#        lines = self.split_diary_last(state['diary_last'], 61)
+
+        self._window.addstr(3,
+                            1,
+                            'Field news:',
+                            curses.color_pair(Colors.STANDART))
+
+#        for i in xrange(len(4, 4 + len(lines))):
+#            self._window.addstr(i,
+#                                1,
+#                                lines[4 - i],
+#                                curses.color_pair(Colors.STANDART))
+
+    def split_diary_last(self, diary_last, lenght):
+        words = diary_last.split(' ', diary_last)
+        lines = []
+
+        for i in xrange(len(words)):
+            current_line = ''
+
+            while(len(current_line) < (level - words[i])):
+                current_line = current_line + ' ' + words[i]
+
+            lines.append(current_line)
+
+        return lines
 
 
 class MainWindow(MonitorWindow):
@@ -103,9 +167,17 @@ class Monitor:
         self.main_window = MainWindow(self.stdscr)
 
     def init_colors(self):
-        curses.init_pair(Colors.STANDART, curses.COLOR_WHITE, curses.COLOR_BLACK)
-        curses.init_pair(Colors.HEALTH_POINTS, curses.COLOR_RED, curses.COLOR_BLACK)
-        curses.init_pair(Colors.POWER_POINTS, curses.COLOR_BLUE, curses.COLOR_BLACK)
+        curses.init_pair(Colors.STANDART,
+                         curses.COLOR_WHITE,
+                         curses.COLOR_BLACK)
+
+        curses.init_pair(Colors.HEALTH_POINTS,
+                         curses.COLOR_RED,
+                         curses.COLOR_BLACK)
+
+        curses.init_pair(Colors.POWER_POINTS,
+                         curses.COLOR_BLUE,
+                         curses.COLOR_BLACK)
 
     def read_state(self):
         state = None
@@ -141,8 +213,15 @@ class Monitor:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('god_name', help = 'Name of the god to me monitored')
-    parser.add_argument('-d', '--dump', type=str, help = 'read state from the dump (debug option)')
+
+    parser.add_argument('god_name',
+                        help = 'Name of the god to me monitored')
+
+    parser.add_argument('-d',
+                        '--dump',
+                        type = str,
+                        help = 'read state from the dump (debug option)')
+
     args = parser.parse_args()
 
     monitor = Monitor(args)
