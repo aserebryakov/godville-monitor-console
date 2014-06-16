@@ -35,6 +35,12 @@ class MonitorWindow:
     def update(self, state):
         assert(False, 'Not implemented')
 
+    def add_strings(self, string_list):
+        for i in range(0, len(string_list)):
+            self._window.addstr(i + 1,
+                                1,
+                                string_list[i][0],
+                                string_list[i][1])
 
 class StatusWindow(MonitorWindow):
     def __init__(self, parent_window):
@@ -44,41 +50,23 @@ class StatusWindow(MonitorWindow):
 
     def update(self, state):
         self._window.addstr(0, 2, 'State')
-        self._window.addstr(1,
-                            1,
-                            state['name'],
-                            curses.color_pair(Colors.STANDART))
 
-        self._window.addstr(2,
-                            1,
-                            'HP    {0}/{1}'.format(state['health'],
-                                                state['max_health']),
-                            curses.color_pair(Colors.HEALTH_POINTS))
+        state_text = [ (state['name'], curses.color_pair(Colors.STANDART)),
+                       ('HP    {0}/{1}'.format(state['health'],
+                                            state['max_health']),
+                        curses.color_pair(Colors.HEALTH_POINTS)),
+                       ('Power    {0}%'.format(state['godpower']),
+                         curses.color_pair(Colors.POWER_POINTS)),
+                       ('Level    {0}'.format(state['level']),
+                         curses.color_pair(Colors.STANDART)),
+                       ('EXP      {0}%'.format(state['exp_progress']),
+                        curses.color_pair(Colors.STANDART)),
+                       ('Town {0}'.format(state['town_name']),
+                        curses.color_pair(Colors.STANDART)),
+                       ('Distance {0}'.format(state['distance']),
+                        curses.color_pair(Colors.STANDART)) ]
 
-        self._window.addstr(3,
-                            1,
-                            'Power    {0}%'.format(state['godpower']),
-                            curses.color_pair(Colors.POWER_POINTS))
-
-        self._window.addstr(4,
-                            1,
-                            'Level    {0}'.format(state['level']),
-                            curses.color_pair(Colors.STANDART))
-
-        self._window.addstr(5,
-                            1,
-                            'EXP      {0}%'.format(state['exp_progress']),
-                            curses.color_pair(Colors.STANDART))
-
-        self._window.addstr(6,
-                            1,
-                            'Town {0}'.format(state['town_name']),
-                            curses.color_pair(Colors.STANDART))
-
-        self._window.addstr(7,
-                            1,
-                            'Distance {0}'.format(state['distance']),
-                            curses.color_pair(Colors.STANDART))
+        self.add_strings(state_text)
 
 class QuestWindow(MonitorWindow):
     def __init__(self, parent_window):
@@ -89,34 +77,20 @@ class QuestWindow(MonitorWindow):
     def update(self, state):
         self._window.addstr(0, 2, 'Quest')
 
-        self._window.addstr(1,
-                            1,
-                            '{0}'.format(state['quest']),
-                            curses.color_pair(Colors.STANDART))
+        state_text = [ ('{0}'.format(state['quest']),
+                        curses.color_pair(Colors.STANDART)),
+                       ('Progress {0}'.format(state['quest_progress']),
+                        curses.color_pair(Colors.STANDART)),
+                       ('Field news:',
+                        curses.color_pair(Colors.STANDART)) ]
 
-        self._window.addstr(2,
-                            1,
-                            'Progress {0}'.format(state['quest_progress']),
-                            curses.color_pair(Colors.STANDART))
-
-#        lines = self.split_diary_last(state['diary_last'], 61)
-
-        self._window.addstr(3,
-                            1,
-                            'Field news:',
-                            curses.color_pair(Colors.STANDART))
-
-#        for i in xrange(len(4, 4 + len(lines))):
-#            self._window.addstr(i,
-#                                1,
-#                                lines[4 - i],
-#                                curses.color_pair(Colors.STANDART))
+        self.add_strings(state_text)
 
     def split_diary_last(self, diary_last, lenght):
         words = diary_last.split(' ', diary_last)
         lines = []
 
-        for i in xrange(len(words)):
+        for i in range(len(words)):
             current_line = ''
 
             while(len(current_line) < (level - words[i])):
