@@ -212,6 +212,8 @@ class ApplicationStatusWindow(MonitorWindow):
         sessionExpired = ''
 
         try:
+            # fictive access to the field
+            state['expired']
             sessionExpired = 'Session is expired'
         except KeyError as err:
             sessionExpired = 'Session is active'
