@@ -29,14 +29,14 @@ class MonitorWindow:
         self._left_window = left_window
 
         if top_window != None:
-            self._y           = top_window.y + top_window.height + 1
+            self._y           = top_window.y + top_window.height
         else:
-            self._y           = 1
+            self._y           = 0
 
         if left_window != None:
-            self._x           = left_window.x + left_window.width + 1
+            self._x           = left_window.x + left_window.width
         else:
-            self._x           = 1
+            self._x           = 0
 
         self._height      = height
         self._width       = width
@@ -83,12 +83,12 @@ class MonitorWindow:
 
 class StatusWindow(MonitorWindow):
     def __init__(self, parent_window, top_window, left_window):
-        height = 20
+        height = 10
         width  = 15
         super(StatusWindow, self).__init__(parent_window, top_window, left_window, height, width)
 
     def update(self, state):
-        self._window.addstr(0, 2, 'State')
+        self._window.addstr(0, 2, 'Status')
 
         state_text = [ (state['name'], Colors.STANDART),
                        ('HP    {0}/{1}'.format(state['health'],
@@ -111,7 +111,11 @@ class QuestWindow(MonitorWindow):
     def __init__(self, parent_window, top_window, left_window):
         (parent_height, parent_width) = parent_window.getmaxyx()
         height = 6
-        width  = parent_height - left_window.x + left_window.width - 1
+        width  = parent_width
+
+        if left_window != None:
+            width = width - left_window.x - left_window.width
+
         super(QuestWindow, self).__init__(parent_window, top_window, left_window, height, width)
 
     def update(self, state):
@@ -144,11 +148,12 @@ class QuestWindow(MonitorWindow):
 class MainWindow(MonitorWindow):
     def __init__(self, stdscr):
         (height, width) = stdscr.getmaxyx()
-        super(MainWindow, self).__init__(stdscr, None, None, height - 2 , width - 2)
+        super(MainWindow, self).__init__(stdscr, None, None, height, width)
 
         self._subwindows = []
         self._subwindows.append(StatusWindow(self.window, None, None))
         self._subwindows.append(QuestWindow(self.window, None, self._subwindows[-1]))
+        self._subwindows.append(QuestWindow(self.window, self._subwindows[-2], None))
 
     def update(self, state):
         for window in self._subwindows:
