@@ -24,13 +24,52 @@ class MonitorWindow:
                         Must be implemented for each derived class
     '''
 
-    def __init__(self, parent_window, height, width, x, y):
-        self._window = parent_window.subwin(height, width, x, y)
+    def __init__(self, parent_window, top_window, left_window, height, width):
+        self._top_window  = top_window
+        self._left_window = left_window
+
+        if top_window != None:
+            self._y           = top_window.y + top_window.height + 1
+        else:
+            self._y           = 1
+
+        if left_window != None:
+            self._x           = left_window.x + left_window.width + 1
+        else:
+            self._x           = 1
+
+        self._height      = height
+        self._width       = width
+        self._window      = parent_window.subwin(self.height, self.width, self.y, self.x)
         self._window.box()
+
+    @property
+    def top_window(self):
+        return self._top_window
+
+    @property
+    def left_window(self):
+        return self._left_window
 
     @property
     def window(self):
         return self._window
+
+    @property
+    def y(self):
+        return self._y
+
+    @property
+    def x(self):
+        return self._x
+
+    @property
+    def height(self):
+        return self._height
+
+    @property
+    def width(self):
+        return self._width
 
     def update(self, state):
         assert(False, 'Not implemented')
@@ -43,10 +82,10 @@ class MonitorWindow:
                                 curses.color_pair(string[1]))
 
 class StatusWindow(MonitorWindow):
-    def __init__(self, parent_window):
+    def __init__(self, parent_window, top_window, left_window):
         height = 20
         width  = 15
-        super(StatusWindow, self).__init__(parent_window, height, width, 1, 1)
+        super(StatusWindow, self).__init__(parent_window, top_window, left_window, height, width)
 
     def update(self, state):
         self._window.addstr(0, 2, 'State')
@@ -69,10 +108,11 @@ class StatusWindow(MonitorWindow):
         self.add_strings(state_text)
 
 class QuestWindow(MonitorWindow):
-    def __init__(self, parent_window):
+    def __init__(self, parent_window, top_window, left_window):
+        (parent_height, parent_width) = parent_window.getmaxyx()
         height = 6
-        width  = 63
-        super(QuestWindow, self).__init__(parent_window, height, width, 1, 16)
+        width  = parent_height - left_window.x + left_window.width - 1
+        super(QuestWindow, self).__init__(parent_window, top_window, left_window, height, width)
 
     def update(self, state):
         self._window.addstr(0, 2, 'Quest')
@@ -104,11 +144,11 @@ class QuestWindow(MonitorWindow):
 class MainWindow(MonitorWindow):
     def __init__(self, stdscr):
         (height, width) = stdscr.getmaxyx()
-        super(MainWindow, self).__init__(stdscr, height, width, 0, 0)
+        super(MainWindow, self).__init__(stdscr, None, None, height - 2 , width - 2)
 
         self._subwindows = []
-        self._subwindows.append(StatusWindow(self.window))
-        self._subwindows.append(QuestWindow(self.window))
+        self._subwindows.append(StatusWindow(self.window, None, None))
+        self._subwindows.append(QuestWindow(self.window, None, self._subwindows[-1]))
 
     def update(self, state):
         for window in self._subwindows:
