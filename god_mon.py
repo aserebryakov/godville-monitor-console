@@ -92,25 +92,25 @@ class MonitorWindow:
 class StatusWindow(MonitorWindow):
     def __init__(self, parent_window, top_window, left_window):
         height = 10
-        width  = 15
+        width  = 22
         super(StatusWindow, self).__init__(parent_window, top_window, left_window, height, width)
 
     def update(self, state):
         self._window.addstr(0, 2, 'Status')
 
         state_text = [ (state['name'], Colors.STANDART),
-                       ('HP    {0}/{1}'.format(state['health'],
-                                            state['max_health']),
+                       ('HP{0:>14}/{1}'.format(state['health'],
+                                               state['max_health']),
                         Colors.HEALTH_POINTS),
-                       ('Power    {0}%'.format(state['godpower']),
+                       ('Power{0:>14}%'.format(state['godpower']),
                          Colors.POWER_POINTS),
-                       ('Level    {0}'.format(state['level']),
+                       ('Level{0:>15}'.format(state['level']),
                          Colors.STANDART),
-                       ('EXP      {0}%'.format(state['exp_progress']),
+                       ('EXP{0:>16}%'.format(state['exp_progress']),
                         Colors.STANDART),
-                       ('Town {0}'.format(state['town_name']),
+                       ('Town{0:>15}'.format(state['town_name']),
                         Colors.STANDART),
-                       ('Distance {0}'.format(state['distance']),
+                       ('Distance{0:>12}'.format(state['distance']),
                         Colors.STANDART) ]
 
         self.write_text(state_text)
@@ -119,7 +119,7 @@ class StatusWindow(MonitorWindow):
 class PetWindow(MonitorWindow):
     def __init__(self, parent_window, top_window, left_window):
         height = 6
-        width  = 15
+        width  = 22
         super(PetWindow, self).__init__(parent_window, top_window, left_window, height, width)
 
     def update(self, state):
@@ -127,9 +127,10 @@ class PetWindow(MonitorWindow):
 
         pet = state['pet']
 
-        state_text = [ (pet['pet_class'], Colors.STANDART),
-                       (pet['pet_name'], Colors.STANDART),
-                       ('Level    {0}'.format(pet['pet_level']),
+        state_text = [ ('{0:^20}'.format(pet['pet_class']),
+                         Colors.STANDART),
+                       ('{0:^20}'.format(pet['pet_name']), Colors.STANDART),
+                       ('Level{0:>14}'.format(pet['pet_level']),
                          Colors.STANDART) ]
 
         self.write_text(state_text)
@@ -174,15 +175,70 @@ class QuestWindow(MonitorWindow):
         return lines
 
 
+class InventoryWindow(MonitorWindow):
+    def __init__(self, parent_window, top_window, left_window):
+        height = 8
+        (parent_height, parent_width) = parent_window.getmaxyx()
+        width  = parent_width
+
+        if left_window != None:
+            width = width - left_window.x - left_window.width
+
+        super(InventoryWindow, self).__init__(parent_window, top_window, left_window, height, width)
+
+    def update(self, state):
+        self._window.addstr(0, 2, 'Inventory')
+
+        state_text = [ ('Bricks{0:>14}'.format(state['bricks_cnt']),
+                         Colors.STANDART),
+                       ('Wood{0:>14}'.format(state['wood_cnt']),
+                         Colors.STANDART),
+                       ('Inventory {0:>10}/{1}'.format(state['inventory_num'],
+                                                       state['inventory_max_num']),
+                         Colors.STANDART) ]
+
+        self.write_text(state_text)
+
+
+class ApplicationStatusWindow(MonitorWindow):
+    def __init__(self, parent_window, top_window, left_window):
+        (height, width) = parent_window.getmaxyx()
+        height = height - top_window.y - top_window.height
+        super(ApplicationStatusWindow, self).__init__(parent_window, top_window, left_window, height, width)
+
+    def update(self, state):
+        self._window.addstr(0, 2, 'Application Status')
+
+        sessionExpired = ''
+
+        try:
+            sessionExpired = 'Session is expired'
+        except KeyError as err:
+            sessionExpired = 'Session is active'
+
+        state_text = [ ( sessionExpired, Colors.STANDART) ]
+
+        self.write_text(state_text)
+
+
 class MainWindow(MonitorWindow):
     def __init__(self, stdscr):
         (height, width) = stdscr.getmaxyx()
         super(MainWindow, self).__init__(stdscr, None, None, height, width)
 
         self._subwindows = []
-        self._subwindows.append(StatusWindow(self.window, None, None))
-        self._subwindows.append(QuestWindow(self.window, None, self._subwindows[-1]))
-        self._subwindows.append(PetWindow(self.window, self._subwindows[-2], None))
+
+        statusWindow    = StatusWindow(self.window, None, None)
+        questWindow     = QuestWindow(self.window, None, statusWindow)
+        petWindow       = PetWindow(self.window, statusWindow, None)
+        inventoryWindow = InventoryWindow(self.window, questWindow, statusWindow)
+        applicationStatusWindow = ApplicationStatusWindow(self.window, petWindow, None)
+
+        self._subwindows.append(statusWindow)
+        self._subwindows.append(questWindow)
+        self._subwindows.append(petWindow)
+        self._subwindows.append(inventoryWindow)
+        self._subwindows.append(applicationStatusWindow)
 
     def update(self, state):
         for window in self._subwindows:
