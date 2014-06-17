@@ -17,11 +17,19 @@ class MonitorWindow:
     Base class for all windows of the Godville Monitor
 
     Properties:
-        window - Reference to curses window object
+        window      - reference to curses window object
+        top_window  - reference to window placed above
+        left_window - reference to window placed on the left
+        x           - x coordinate of the window
+        y           - y coordinate of the window
+        width       - window width
+        height      - window height
 
     Methods:
         update(state) - Virtual method to update window with a given state
                         Must be implemented for each derived class
+
+        write_text(string_list) - writes all the lines in argument to a window
     '''
 
     def __init__(self, parent_window, top_window, left_window, height, width):
@@ -74,7 +82,7 @@ class MonitorWindow:
     def update(self, state):
         assert(False, 'Not implemented')
 
-    def add_strings(self, string_list):
+    def write_text(self, string_list):
         for i, string in enumerate(string_list):
             self._window.addstr(i + 1,
                                 1,
@@ -105,7 +113,7 @@ class StatusWindow(MonitorWindow):
                        ('Distance {0}'.format(state['distance']),
                         Colors.STANDART) ]
 
-        self.add_strings(state_text)
+        self.write_text(state_text)
 
 
 class PetWindow(MonitorWindow):
@@ -124,7 +132,7 @@ class PetWindow(MonitorWindow):
                        ('Level    {0}'.format(pet['pet_level']),
                          Colors.STANDART) ]
 
-        self.add_strings(state_text)
+        self.write_text(state_text)
 
 class QuestWindow(MonitorWindow):
     def __init__(self, parent_window, top_window, left_window):
@@ -149,7 +157,7 @@ class QuestWindow(MonitorWindow):
                        (state['diary_last'],
                         Colors.STANDART) ]
 
-        self.add_strings(state_text)
+        self.write_text(state_text)
 
     def split_diary_last(self, diary_last, lenght):
         words = diary_last.split(' ', diary_last)
