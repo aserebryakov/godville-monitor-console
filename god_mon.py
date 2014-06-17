@@ -107,10 +107,29 @@ class StatusWindow(MonitorWindow):
 
         self.add_strings(state_text)
 
+
+class PetWindow(MonitorWindow):
+    def __init__(self, parent_window, top_window, left_window):
+        height = 6
+        width  = 15
+        super(PetWindow, self).__init__(parent_window, top_window, left_window, height, width)
+
+    def update(self, state):
+        self._window.addstr(0, 2, 'Pet')
+
+        pet = state['pet']
+
+        state_text = [ (pet['pet_class'], Colors.STANDART),
+                       (pet['pet_name'], Colors.STANDART),
+                       ('Level    {0}'.format(pet['pet_level']),
+                         Colors.STANDART) ]
+
+        self.add_strings(state_text)
+
 class QuestWindow(MonitorWindow):
     def __init__(self, parent_window, top_window, left_window):
         (parent_height, parent_width) = parent_window.getmaxyx()
-        height = 6
+        height = 8
         width  = parent_width
 
         if left_window != None:
@@ -126,6 +145,8 @@ class QuestWindow(MonitorWindow):
                        ('Progress {0}'.format(state['quest_progress']),
                         Colors.STANDART),
                        ('Field news:',
+                        Colors.STANDART),
+                       (state['diary_last'],
                         Colors.STANDART) ]
 
         self.add_strings(state_text)
@@ -153,7 +174,7 @@ class MainWindow(MonitorWindow):
         self._subwindows = []
         self._subwindows.append(StatusWindow(self.window, None, None))
         self._subwindows.append(QuestWindow(self.window, None, self._subwindows[-1]))
-        self._subwindows.append(QuestWindow(self.window, self._subwindows[-2], None))
+        self._subwindows.append(PetWindow(self.window, self._subwindows[-2], None))
 
     def update(self, state):
         for window in self._subwindows:
