@@ -80,7 +80,8 @@ class MonitorWindow:
         return self._width
 
     def update(self, state):
-        assert(False, 'Not implemented')
+        self.window.clear()
+        self.window.box()
 
     def write_text(self, string_list):
         for i, string in enumerate(string_list):
@@ -96,6 +97,7 @@ class StatusWindow(MonitorWindow):
         super(StatusWindow, self).__init__(parent_window, top_window, left_window, height, width)
 
     def update(self, state):
+        super(StatusWindow, self).update(state)
         self._window.addstr(0, 2, 'Status')
 
         state_text = [ (state['name'], Colors.STANDART),
@@ -123,6 +125,7 @@ class PetWindow(MonitorWindow):
         super(PetWindow, self).__init__(parent_window, top_window, left_window, height, width)
 
     def update(self, state):
+        super(PetWindow, self).update(state)
         self._window.addstr(0, 2, 'Pet')
 
         pet = state['pet']
@@ -147,6 +150,7 @@ class QuestWindow(MonitorWindow):
         super(QuestWindow, self).__init__(parent_window, top_window, left_window, height, width)
 
     def update(self, state):
+        super(QuestWindow, self).update(state)
         self._window.addstr(0, 2, 'Quest')
 
         state_text = [ ('{0}'.format(state['quest']),
@@ -187,6 +191,7 @@ class InventoryWindow(MonitorWindow):
         super(InventoryWindow, self).__init__(parent_window, top_window, left_window, height, width)
 
     def update(self, state):
+        super(InventoryWindow, self).update(state)
         self._window.addstr(0, 2, 'Inventory')
 
         state_text = [ ('Bricks{0:>14}'.format(state['bricks_cnt']),
@@ -207,6 +212,7 @@ class ApplicationStatusWindow(MonitorWindow):
         super(ApplicationStatusWindow, self).__init__(parent_window, top_window, left_window, height, width)
 
     def update(self, state):
+        super(ApplicationStatusWindow, self).update(state)
         self._window.addstr(0, 2, 'Application Status')
 
         sessionExpired = ''
