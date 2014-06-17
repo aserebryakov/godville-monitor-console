@@ -36,11 +36,11 @@ class MonitorWindow:
         assert(False, 'Not implemented')
 
     def add_strings(self, string_list):
-        for i in range(0, len(string_list)):
+        for i, string in enumerate(string_list):
             self._window.addstr(i + 1,
                                 1,
-                                string_list[i][0],
-                                curses.color_pair(string_list[i][1]))
+                                string[0],
+                                curses.color_pair(string[1]))
 
 class StatusWindow(MonitorWindow):
     def __init__(self, parent_window):
