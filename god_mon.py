@@ -13,7 +13,8 @@ class StatusWindow(MonitorWindow):
     def __init__(self, parent_window, top_window, left_window):
         height = 10
         width  = 22
-        super(StatusWindow, self).__init__(parent_window,
+        super(StatusWindow, self).__init__('Status',
+                                           parent_window,
                                            top_window,
                                            left_window,
                                            height,
@@ -21,7 +22,6 @@ class StatusWindow(MonitorWindow):
 
     def update(self, state):
         super(StatusWindow, self).update(state)
-        self._window.addstr(0, 2, 'Status')
 
     def init_text_entries(self):
         self.text_entries.append(TextEntry('', 'name', self.width))
@@ -52,7 +52,8 @@ class PetWindow(MonitorWindow):
     def __init__(self, parent_window, top_window, left_window):
         height = 6
         width  = 22
-        super(PetWindow, self).__init__(parent_window,
+        super(PetWindow, self).__init__('Pet',
+                                        parent_window,
                                         top_window,
                                         left_window,
                                         height,
@@ -61,7 +62,6 @@ class PetWindow(MonitorWindow):
     def update(self, state):
         pet = state['pet']
         super(PetWindow, self).update(pet)
-        self._window.addstr(0, 2, 'Pet')
 
     def init_text_entries(self):
         self.text_entries.append(TextEntry('', 'pet_class', self.width))
@@ -78,7 +78,8 @@ class QuestWindow(MonitorWindow):
         if left_window != None:
             width = width - left_window.x - left_window.width
 
-        super(QuestWindow, self).__init__(parent_window,
+        super(QuestWindow, self).__init__('Quest',
+                                          parent_window,
                                           top_window,
                                           left_window,
                                           height,
@@ -86,10 +87,9 @@ class QuestWindow(MonitorWindow):
 
     def update(self, state):
         super(QuestWindow, self).update(state)
-        self._window.addstr(0, 2, 'Quest')
 
     def init_text_entries(self):
-        self.text_entries.append(TextEntry('Quest:', 'quest', self.width))
+        self.text_entries.append(TextEntry('', 'quest', self.width))
         self.text_entries.append(TextEntry('Progress, %',
                                            'quest_progress',
                                            self.width))
@@ -113,7 +113,8 @@ class InventoryWindow(MonitorWindow):
         if left_window != None:
             width = width - left_window.x - left_window.width
 
-        super(InventoryWindow, self).__init__(parent_window,
+        super(InventoryWindow, self).__init__('Inventory',
+                                              parent_window,
                                               top_window,
                                               left_window,
                                               height,
@@ -121,7 +122,6 @@ class InventoryWindow(MonitorWindow):
 
     def update(self, state):
         super(InventoryWindow, self).update(state)
-        self._window.addstr(0, 2, 'Inventory')
 
     def init_text_entries(self):
         self.text_entries.append(TextEntry('Bricks', 'bricks_cnt', self.width))
@@ -134,7 +134,8 @@ class ApplicationStatusWindow(MonitorWindow):
     def __init__(self, parent_window, top_window, left_window):
         (height, width) = parent_window.getmaxyx()
         height = height - top_window.y - top_window.height
-        super(ApplicationStatusWindow, self).__init__(parent_window,
+        super(ApplicationStatusWindow, self).__init__('Application Status',
+                                                      parent_window,
                                                       top_window,
                                                       left_window,
                                                       height,
@@ -144,22 +145,21 @@ class ApplicationStatusWindow(MonitorWindow):
         try:
             # fictive access to the field
             state['expired']
-            state['session_status'] = 'expired'
+            state['session_status'] = 'Session is expired'
         except KeyError as err:
-            state['session_status'] = 'active'
+            state['session_status'] = 'Session is active'
 
         super(ApplicationStatusWindow, self).update(state)
-        self._window.addstr(0, 2, 'Application Status')
 
     def init_text_entries(self):
-        self.text_entries.append(TextEntry('Session is',
+        self.text_entries.append(TextEntry('',
                                            'session_status',
                                            self.width))
 
 class MainWindow(MonitorWindow):
     def __init__(self, stdscr):
         (height, width) = stdscr.getmaxyx()
-        super(MainWindow, self).__init__(stdscr, None, None, height, width)
+        super(MainWindow, self).__init__('', stdscr, None, None, height, width)
 
         self._subwindows = []
 

@@ -5,7 +5,15 @@ class MonitorWindow:
     Base class for all windows of the Godville Monitor
 
     '''
-    def __init__(self, parent_window, top_window, left_window, height, width):
+    def __init__(self,
+                 title,
+                 parent_window,
+                 top_window,
+                 left_window,
+                 height,
+                 width):
+
+        self._title        = title
         self._top_window   = top_window
         self._left_window  = left_window
         self._text_entries = []
@@ -58,6 +66,10 @@ class MonitorWindow:
         return self._width
 
     @property
+    def title(self):
+        return self._title
+
+    @property
     def text_entries(self):
         return self._text_entries
 
@@ -67,6 +79,7 @@ class MonitorWindow:
     def update(self, state):
         self.window.clear()
         self.window.box()
+        self._window.addstr(0, 2, self.title)
 
         for entry in self.text_entries:
             entry.update(state)

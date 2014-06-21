@@ -55,6 +55,7 @@ class TextEntry:
             self._text = ''
             return
 
+        # In case of empty predefined text use center alignment
         if self.predefined_text == '':
             text_format = '{0}{1:^{2}}'
 
