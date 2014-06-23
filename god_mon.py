@@ -1,3 +1,5 @@
+#/bin/python3
+
 import pprint
 import json
 import time
@@ -7,6 +9,7 @@ import argparse
 from monitor_window import MonitorWindow
 from text_entry import TextEntry
 from text_entry import Colors
+from timer import Timer
 
 
 class StatusWindow(MonitorWindow):
@@ -248,13 +251,17 @@ class Monitor:
         return state
 
     def main_loop(self):
-        state = None
-        previous_state = None
+        timer = Timer(10)
+        state = json.loads(self.read_state())
+        self.main_window.update(state)
 
         while(True):
-            state = json.loads(self.read_state())
-            self.main_window.update(state)
-            time.sleep(10)
+            if timer.expired():
+                state = json.loads(self.read_state())
+                self.main_window.update(state)
+                timer.reset()
+            time.sleep(1)
+
 
 def main():
     parser = argparse.ArgumentParser()
