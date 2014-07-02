@@ -6,10 +6,9 @@ import time
 from urllib.request import urlopen
 import curses
 import argparse
-from monitor_window import MonitorWindow
-from text_entry import TextEntry
-from text_entry import Colors
-from timer import Timer
+from core import Colors
+from core import Timer
+from monitor import MainWindow
 
 
 class Monitor:
