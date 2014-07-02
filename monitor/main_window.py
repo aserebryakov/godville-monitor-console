@@ -1,13 +1,13 @@
 import curses
-from monitor_window import MonitorWindow
-from text_entry import TextEntry
-from text_entry import Colors
+from core import MonitorWindow
+from core import TextEntry
+from core import Colors
 
-from status_window import StatusWindow
-from quest_window import QuestWindow
-from pet_window import PetWindow
-from inventory_window import InventoryWindow
-from application_status_window import ApplicationStatusWindow
+from .status_window import StatusWindow
+from .quest_window import QuestWindow
+from .pet_window import PetWindow
+from .inventory_window import InventoryWindow
+from .application_status_window import ApplicationStatusWindow
 
 
 class MainWindow(MonitorWindow):
