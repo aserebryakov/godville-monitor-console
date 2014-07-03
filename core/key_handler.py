@@ -1,6 +1,6 @@
 import curses
 
-class HandlerAlreadyRegisteredException(BaseException)
+class HandlerAlreadyRegisteredException(BaseException):
     pass
 
 class KeyHandlingManager:
