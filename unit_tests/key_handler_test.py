@@ -23,36 +23,27 @@ class KeyHandlingManagerTestFixture(unittest.TestCase):
 
 class HandlerRegisteringTest(KeyHandlingManagerTestFixture):
     def positive_test(self):
-        self.manager.register_handler(1, self.key_function1)
-        self.manager.register_handler(2, self.key_function2)
-        self.manager.register_handler(3, self.key_function3)
+        self.manager.register_handler('q', self.key_function1)
+        self.manager.register_handler('a', self.key_function2)
+        self.manager.register_handler('c', self.key_function3)
 
-        self.assertEqual(1, self.manager.handle_key(1))
-        self.assertEqual(2, self.manager.handle_key(2))
-        self.assertEqual(3, self.manager.handle_key(3))
+        self.assertEqual(1, self.manager.handle_key('q'))
+        self.assertEqual(2, self.manager.handle_key('a'))
+        self.assertEqual(3, self.manager.handle_key('c'))
 
     def negative_test_already_registered(self):
         try:
-            self.manager.register_handler(1, self.key_function1)
-            self.manager.register_handler(1, self.key_function2)
+            self.manager.register_handler('q', self.key_function1)
+            self.manager.register_handler('q', self.key_function2)
             self._assert(False, 'Handler registration exception wasn\'t raised')
         except HandlerAlreadyRegisteredException:
             pass
-
-    def negative_test_not_registered(self):
-        try:
-            self.manager.handle_key(1)
-            self._assert(False, 'Handler call exception wasn\'t raised')
-        except HandlerNotRegisteredException:
-            pass
-
 
 
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(HandlerRegisteringTest('positive_test'))
     suite.addTest(HandlerRegisteringTest('negative_test_already_registered'))
-    suite.addTest(HandlerRegisteringTest('negative_test_not_registered'))
     return suite
 
 

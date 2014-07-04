@@ -8,11 +8,22 @@ import curses
 import argparse
 from core import Colors
 from core import Timer
+from core import KeyHandlingManager
 from monitor import MainWindow
+
+class KeyHandler:
+
+    @staticmethod
+    def quit():
+        curses.echo()
+        curses.nocbreak()
+        curses.endwin()
+        exit(0)
 
 
 class Monitor:
     def __init__(self, args):
+        self.key_manager = KeyHandlingManager()
         self.init_windows()
         self.godname = args.god_name
         self.dump_file = args.dump
@@ -22,12 +33,15 @@ class Monitor:
 
         if curses.has_colors() == True:
             curses.start_color()
+
         self.init_colors()
+        self.init_keys()
 
     def __del__(self):
-        curses.echo()
-        curses.nocbreak()
-        curses.endwin()
+        KeyHandler.quit()
+
+    def init_keys(self):
+        self.key_manager.register_handler('q', KeyHandler.quit)
 
     def init_windows(self):
         self.stdscr = curses.initscr()
@@ -71,6 +85,12 @@ class Monitor:
 
         return state
 
+    def handle_key(self):
+        key = self.stdscr.getkey()
+
+        if key != '':
+            self.key_manager.handle_key(key)
+
     def main_loop(self):
         timer = Timer(10)
         state = json.loads(self.read_state())
@@ -81,7 +101,8 @@ class Monitor:
                 state = json.loads(self.read_state())
                 self.main_window.update(state)
                 timer.reset()
-            time.sleep(1)
+            self.handle_key()
+            time.sleep(0.1)
 
 
 def main():
