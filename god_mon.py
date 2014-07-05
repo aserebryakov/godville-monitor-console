@@ -1,11 +1,12 @@
 #/bin/python3
 
-import pprint
-import json
+import sys
 import time
-from urllib.request import urlopen
-import curses
 import argparse
+import json
+import curses
+from urllib.request import urlopen
+
 from core import Colors
 from core import Timer
 from core import KeyHandlingManager
@@ -15,10 +16,7 @@ class KeyHandler:
 
     @staticmethod
     def quit():
-        curses.echo()
-        curses.nocbreak()
-        curses.endwin()
-        exit(0)
+        sys.exit()
 
 
 class Monitor:
@@ -38,7 +36,9 @@ class Monitor:
         self.init_keys()
 
     def __del__(self):
-        KeyHandler.quit()
+        curses.echo()
+        curses.nocbreak()
+        curses.endwin()
 
     def init_keys(self):
         self.key_manager.register_handler('q', KeyHandler.quit)

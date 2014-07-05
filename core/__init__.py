@@ -6,4 +6,3 @@ from .text_entry import Colors
 
 from .key_handler import KeyHandlingManager
 from .key_handler import HandlerAlreadyRegisteredException
-from .key_handler import HandlerNotRegisteredException
