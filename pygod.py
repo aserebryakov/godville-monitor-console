@@ -92,7 +92,7 @@ class Monitor:
             self.key_manager.handle_key(key)
 
     def main_loop(self):
-        timer = Timer(10)
+        timer = Timer(60)
         state = json.loads(self.read_state())
         self.main_window.update(state)
 

@@ -11,7 +11,7 @@ class Timer:
         return self._interval
 
     def expired(self):
-        return int(time.perf_counter()) > self._end_time
+        return (int(time.perf_counter()) > self._end_time)
 
     def reset(self):
         self._end_time = int(time.perf_counter()) + self.interval
