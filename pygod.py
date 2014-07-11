@@ -149,7 +149,7 @@ def main():
     if (args.debug):
         log_level = logging.DEBUG
 
-    logging.basicConfig(format='%(asctime)s %(message)s',
+    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
                         filename='pygod.log',
                         filemode='w+',
                         level=log_level)
