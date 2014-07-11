@@ -5,6 +5,7 @@ import time
 import argparse
 import json
 import curses
+import logging
 from urllib.request import urlopen
 
 from core import Colors
@@ -62,12 +63,25 @@ class Monitor:
                          curses.COLOR_BLACK)
 
     def read_state(self):
+        logging.debug('%s: reading state',
+                      self.read_state.__name__)
+
         state = None
-        if self.dump_file != None:
-            state = self.read_dump(self.dump_file).decode('utf-8')
-        else:
-            state = self.read_form_url('http://godville.net/gods/api/{0}.json'
-                                       .format(self.godname))
+
+        try:
+            if self.dump_file != None:
+                state = self.read_dump(self.dump_file).decode('utf-8')
+            else:
+                state = self.read_form_url('http://godville.net/gods/api/{0}.json'
+                                           .format(self.godname))
+        except Exception as e:
+            logging.error('%s: reading state error \n %s',
+                          self.read_state.__name__,
+                          str(e))
+            print('Error occured, please see the pygod.log')
+
+            sys.exit()
+
         return state
 
     def read_form_url(self, url):
@@ -106,6 +120,7 @@ class Monitor:
 
 
 def main():
+    # Parsing arguments
     parser = argparse.ArgumentParser()
 
     parser.add_argument('god_name',
@@ -117,6 +132,10 @@ def main():
                         help = 'read state from the dump (debug option)')
 
     args = parser.parse_args()
+
+    # Configuring logs
+    logging.basicConfig(filename='pygod.log', filemode='w+', level=logging.DEBUG)
+    logging.debug('Starting PyGod with username %s', args.god_name)
 
     monitor = Monitor(args)
     monitor.main_loop()

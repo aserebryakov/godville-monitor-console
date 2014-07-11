@@ -1,3 +1,4 @@
+import logging
 import curses
 
 class MonitorWindow:
@@ -77,6 +78,10 @@ class MonitorWindow:
         self.text_entries.append(entry)
 
     def update(self, state):
+        logging.debug('%s: Updating window \'%s\'',
+                      self.update.__name__,
+                      self.title)
+
         self.window.clear()
         self.window.box()
         self._window.addstr(0, 2, self.title)
@@ -92,6 +97,10 @@ class MonitorWindow:
 
     def write_text(self, entries):
         for i, entry in enumerate(entries):
+            logging.debug('%s: Writting text \'%s\'',
+                          self.write_text.__name__,
+                          entry.text)
+
             self._window.addstr(i + 1,
                                 1,
                                 entry.text,
