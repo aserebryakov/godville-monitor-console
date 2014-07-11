@@ -47,6 +47,7 @@ class Monitor:
     def init_windows(self):
         self.stdscr = curses.initscr()
         self.stdscr.clear()
+        self.stdscr.nodelay(True)
         self.main_window = MainWindow(self.stdscr)
 
     def init_colors(self):
@@ -100,10 +101,12 @@ class Monitor:
         return state
 
     def handle_key(self):
-        key = self.stdscr.getkey()
-
-        if key != '':
+        try:
+            key = self.stdscr.getkey()
             self.key_manager.handle_key(key)
+        except curses.error as e:
+            if not 'no input' in e.args:
+                raise
 
     def main_loop(self):
         timer = Timer(60)
