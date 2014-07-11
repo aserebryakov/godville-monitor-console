@@ -36,6 +36,8 @@ class Monitor:
         self.init_colors()
         self.init_keys()
 
+
+
     def __del__(self):
         curses.echo()
         curses.nocbreak()
@@ -134,10 +136,23 @@ def main():
                         type = str,
                         help = 'read state from the dump (debug option)')
 
+    parser.add_argument('-D',
+                        '--debug',
+                        action = 'store_true',
+                        help = 'enable debug logs')
+
     args = parser.parse_args()
 
     # Configuring logs
-    logging.basicConfig(filename='pygod.log', filemode='w+', level=logging.DEBUG)
+    log_level = logging.ERROR
+
+    if (args.debug):
+        log_level = logging.DEBUG
+
+    logging.basicConfig(format='%(asctime)s %(message)s',
+                        filename='pygod.log',
+                        filemode='w+',
+                        level=log_level)
     logging.debug('Starting PyGod with username %s', args.god_name)
 
     monitor = Monitor(args)
