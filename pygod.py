@@ -144,7 +144,7 @@ def main():
     args = parser.parse_args()
 
     # Configuring logs
-    log_level = logging.ERROR
+    log_level = logging.WARNING
 
     if (args.debug):
         log_level = logging.DEBUG

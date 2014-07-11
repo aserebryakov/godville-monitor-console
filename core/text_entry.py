@@ -50,8 +50,8 @@ class TextEntry:
 
     def update(self, state, attribute = None):
         logging.debug('%s: Updating entry \'%s\'',
-                      self.update.__name__,
-                      self.predefined_text)
+                       self.update.__name__,
+                       self.predefined_text)
 
         key_width   = self.width - len(self.predefined_text) - 2
         custom_text = ''
@@ -68,9 +68,9 @@ class TextEntry:
         try:
             custom_text = '{0}'.format(state[self.key])
         except KeyError:
-            logging.debug('%s: Key not found \'%s\'',
-                          self.update.__name__,
-                          key)
+            logging.warning('%s: Key not found \'%s\'',
+                            self.update.__name__,
+                            key)
 
             self._text = '{0} key not found'.format(self.key)
             return
