@@ -12,17 +12,16 @@ class Timer:
         return self._interval
 
     def expired(self):
-        result = (int(time.perf_counter()) > self._end_time)
-
-        logging.debug('%s: result is %s',
-                      self.expired.__name__,
-                      str(result))
+        current_time = int(time.perf_counter())
+        result = (current_time > self._end_time)
 
         return result
 
     def reset(self):
-        self._end_time = int(time.perf_counter()) + self.interval
-        logging.debug('%s: resetting timer to time %s',
+        current_time = int(time.perf_counter())
+        self._end_time =  current_time + self.interval
+        logging.debug('%s: resetting timer \n start time %d\n end time is %d',
                       self.reset.__name__,
-                      str(self._end_time))
+                      current_time,
+                      self._end_time)
 
