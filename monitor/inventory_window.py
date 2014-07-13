@@ -5,7 +5,7 @@ from core.text_entry import Colors
 
 
 class InventoryWindow(MonitorWindow):
-    def __init__(self, parent_window, top_window, left_window):
+    def __init__(self, parent_window, top_window = None, left_window = None):
         height = 8
         (parent_height, parent_width) = parent_window.getmaxyx()
         width  = parent_width
@@ -14,11 +14,11 @@ class InventoryWindow(MonitorWindow):
             width = width - left_window.x - left_window.width
 
         super(InventoryWindow, self).__init__('Inventory',
+                                              height,
+                                              width,
                                               parent_window,
                                               top_window,
-                                              left_window,
-                                              height,
-                                              width)
+                                              left_window)
 
     def update(self, state):
         super(InventoryWindow, self).update(state)

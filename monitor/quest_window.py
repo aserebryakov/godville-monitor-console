@@ -5,7 +5,7 @@ from core.text_entry import Colors
 
 
 class QuestWindow(MonitorWindow):
-    def __init__(self, parent_window, top_window, left_window):
+    def __init__(self, parent_window, top_window = None, left_window = None):
         (parent_height, parent_width) = parent_window.getmaxyx()
         height = 8
         width  = parent_width
@@ -14,11 +14,11 @@ class QuestWindow(MonitorWindow):
             width = width - left_window.x - left_window.width
 
         super(QuestWindow, self).__init__('Quest',
+                                          height,
+                                          width,
                                           parent_window,
                                           top_window,
-                                          left_window,
-                                          height,
-                                          width)
+                                          left_window)
 
     def update(self, state):
         super(QuestWindow, self).update(state)

@@ -5,15 +5,15 @@ from core.text_entry import Colors
 
 
 class StatusWindow(MonitorWindow):
-    def __init__(self, parent_window, top_window, left_window):
+    def __init__(self, parent_window, top_window = None, left_window = None):
         height = 10
         width  = 22
         super(StatusWindow, self).__init__('Status',
+                                           height,
+                                           width,
                                            parent_window,
                                            top_window,
-                                           left_window,
-                                           height,
-                                           width)
+                                           left_window)
 
     def update(self, state):
         super(StatusWindow, self).update(state)

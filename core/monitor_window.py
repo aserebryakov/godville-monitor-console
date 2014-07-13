@@ -8,11 +8,13 @@ class MonitorWindow:
     '''
     def __init__(self,
                  title,
-                 parent_window,
-                 top_window,
-                 left_window,
                  height,
-                 width):
+                 width,
+                 parent_window,
+                 top_window = None,
+                 left_window = None,
+                 y = 0,
+                 x = 0):
 
         self._title        = title
         self._top_window   = top_window
@@ -22,12 +24,12 @@ class MonitorWindow:
         if top_window != None:
             self._y           = top_window.y + top_window.height
         else:
-            self._y           = 0
+            self._y           = y
 
         if left_window != None:
             self._x           = left_window.x + left_window.width
         else:
-            self._x           = 0
+            self._x           = x
 
         self._height      = height
         self._width       = width

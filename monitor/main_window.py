@@ -13,11 +13,11 @@ from .application_status_window import ApplicationStatusWindow
 class MainWindow(MonitorWindow):
     def __init__(self, stdscr):
         (height, width) = stdscr.getmaxyx()
-        super(MainWindow, self).__init__('', stdscr, None, None, height, width)
+        super(MainWindow, self).__init__('', height, width, stdscr)
 
         self._subwindows = []
 
-        statusWindow    = StatusWindow(self.window, None, None)
+        statusWindow    = StatusWindow(self.window)
         questWindow     = QuestWindow(self.window, None, statusWindow)
         petWindow       = PetWindow(self.window, statusWindow, None)
         inventoryWindow = InventoryWindow(self.window,
