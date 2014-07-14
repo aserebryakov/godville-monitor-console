@@ -1,10 +1,10 @@
 import curses
-from core.monitor_window import MonitorWindow
-from core.text_entry import TextEntry
-from core.text_entry import Colors
+from core import TiledWindow
+from core import TextEntry
+from core import Colors
 
 
-class InventoryWindow(MonitorWindow):
+class InventoryWindow(TiledWindow):
     def __init__(self, parent_window, top_window = None, left_window = None):
         height = 8
         (parent_height, parent_width) = parent_window.getmaxyx()

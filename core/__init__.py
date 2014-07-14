@@ -1,5 +1,5 @@
 from .timer import Timer
-from .monitor_window import MonitorWindow
+from .tiled_window import TiledWindow
 
 from .text_entry import TextEntry
 from .text_entry import Colors

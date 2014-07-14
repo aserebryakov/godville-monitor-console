@@ -1,5 +1,5 @@
 import curses
-from core import MonitorWindow
+from core import TiledWindow
 from core import TextEntry
 from core import Colors
 
@@ -10,7 +10,7 @@ from .inventory_window import InventoryWindow
 from .application_status_window import ApplicationStatusWindow
 
 
-class MainWindow(MonitorWindow):
+class MainWindow(TiledWindow):
     def __init__(self, stdscr):
         (height, width) = stdscr.getmaxyx()
         super(MainWindow, self).__init__('', height, width, stdscr)

@@ -1,7 +1,7 @@
 import logging
 import curses
 
-class MonitorWindow:
+class MonitorWindowBase:
     '''
     Base class for all windows of the Godville Monitor
 
@@ -11,42 +11,22 @@ class MonitorWindow:
                  height,
                  width,
                  parent_window,
-                 top_window = None,
-                 left_window = None,
                  y = 0,
                  x = 0):
 
         self._title        = title
-        self._top_window   = top_window
-        self._left_window  = left_window
         self._text_entries = []
-
-        if top_window != None:
-            self._y           = top_window.y + top_window.height
-        else:
-            self._y           = y
-
-        if left_window != None:
-            self._x           = left_window.x + left_window.width
-        else:
-            self._x           = x
 
         self._height      = height
         self._width       = width
+        self._x           = x
+        self._y           = y
         self._window      = parent_window.subwin(self.height,
                                                  self.width,
                                                  self.y,
                                                  self.x)
         self._window.box()
         self.init_text_entries()
-
-    @property
-    def top_window(self):
-        return self._top_window
-
-    @property
-    def left_window(self):
-        return self._left_window
 
     @property
     def window(self):
