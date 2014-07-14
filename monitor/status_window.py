@@ -15,9 +15,6 @@ class StatusWindow(TiledWindow):
                                            top_window,
                                            left_window)
 
-    def update(self, state):
-        super(StatusWindow, self).update(state)
-
     def init_text_entries(self):
         self.text_entries.append(TextEntry('', 'name', self.width))
         self.text_entries.append(TextEntry('HP',
