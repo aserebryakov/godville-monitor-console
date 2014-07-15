@@ -9,9 +9,10 @@ class WarningWindow(MonitorWindowBase):
                  text):
 
         self._text = text
+        self._last_line = 'Press ENTER...'
 
         # Include borders to window size
-        width  = len(text) + 2
+        width  = max(len(self._text), len(self._last_line)) + 2
         height = 5
 
         (max_y, max_x) = parent_window.getmaxyx()
@@ -35,4 +36,4 @@ class WarningWindow(MonitorWindowBase):
 
     def init_text_entries(self):
         self.text_entries.append(TextEntry(self._text, '', self.width))
-        self.text_entries.append(TextEntry('Press any key...', '', self.width))
+        self.text_entries.append(TextEntry(self._last_line, '', self.width))

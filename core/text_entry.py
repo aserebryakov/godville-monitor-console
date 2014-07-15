@@ -57,26 +57,29 @@ class TextEntry:
         custom_text = ''
         text_format = '{0}{1:>{2}}'
 
-        if self.key == '':
+        if self.key == '' and self.predefined_text == '':
             self._text = ''
             return
 
         # In case of empty predefined text use center alignment
         if self.predefined_text == '':
             text_format = '{0}{1:^{2}}'
+        elif self.key == '':
+            text_format = '{0:^{2}}'
 
-        try:
-            custom_text = '{0}'.format(state[self.key])
-        except KeyError:
-            logging.warning('%s: Key not found \'%s\'',
-                            self.update.__name__,
-                            key)
+        if self.key != '':
+            try:
+                custom_text = '{0}'.format(state[self.key])
+            except KeyError:
+                logging.warning('%s: Key not found \'%s\'',
+                                self.update.__name__,
+                                self.key)
 
-            self._text = '{0} key not found'.format(self.key)
-            return
+                self._text = '{0} key not found'.format(self.key)
+                return
 
-        if key_width < 1:
-            self._text = '{0} text doesn\'t fit'.format(key)
+        if key_width < 0:
+            self._text = '{0} text doesn\'t fit'.format(self.key)
             return
 
         self._text = text_format.format(self.predefined_text,
