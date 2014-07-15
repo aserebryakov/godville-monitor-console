@@ -11,13 +11,9 @@ from urllib.request import urlopen
 from core import Colors
 from core import Timer
 from core import KeyHandlingManager
+from core import WarningWindow
 from monitor import MainWindow
 
-class KeyHandler:
-
-    @staticmethod
-    def quit():
-        sys.exit()
 
 
 class Monitor:
@@ -30,9 +26,6 @@ class Monitor:
         curses.noecho()
         curses.cbreak()
 
-        if curses.has_colors() == True:
-            curses.start_color()
-
         self.init_colors()
         self.init_keys()
 
@@ -44,13 +37,16 @@ class Monitor:
         curses.endwin()
 
     def init_keys(self):
-        self.key_manager.register_handler('q', KeyHandler.quit)
+        self.key_manager.register_handler('q', self.quit)
 
     def init_windows(self):
         self.stdscr = curses.initscr()
         self.stdscr.clear()
         self.stdscr.nodelay(True)
+        curses.start_color()
+
         self.main_window = MainWindow(self.stdscr)
+        self.warning = WarningWindow(self.stdscr, 'WARNING')
 
     def init_colors(self):
         curses.init_pair(Colors.STANDART,
@@ -64,6 +60,10 @@ class Monitor:
         curses.init_pair(Colors.POWER_POINTS,
                          curses.COLOR_BLUE,
                          curses.COLOR_BLACK)
+
+        curses.init_pair(Colors.ATTENTION,
+                         curses.COLOR_WHITE,
+                         curses.COLOR_RED)
 
     def read_state(self):
         logging.debug('%s: reading state',
@@ -109,6 +109,9 @@ class Monitor:
         except curses.error as e:
             if not 'no input' in e.args:
                 raise
+
+    def quit(self):
+        sys.exit(0)
 
     def main_loop(self):
         timer = Timer(60)

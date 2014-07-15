@@ -1,6 +1,7 @@
 import logging
 import curses
 from .text_entry import TextEntry
+from .text_entry import Colors
 from .monitor_window import MonitorWindowBase
 
 class WarningWindow(MonitorWindowBase):
@@ -34,6 +35,8 @@ class WarningWindow(MonitorWindowBase):
                                             y,
                                             x)
 
+        self.window.bkgd(' ', curses.color_pair(Colors.ATTENTION))
+
     def init_text_entries(self):
-        self.text_entries.append(TextEntry(self._text, '', self.width))
-        self.text_entries.append(TextEntry(self._last_line, '', self.width))
+        self.text_entries.append(TextEntry(self._text, '', self.width, Colors.ATTENTION))
+        self.text_entries.append(TextEntry(self._last_line, '', self.width, Colors.ATTENTION))
