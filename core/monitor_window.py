@@ -64,7 +64,7 @@ class MonitorWindowBase:
                       self.update.__name__,
                       self.title)
 
-        self.window.clear()
+        self.window.erase()
         self.window.box()
         self._window.addstr(0, 2, self.title)
 
