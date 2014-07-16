@@ -15,21 +15,19 @@ from core import WarningWindow
 from monitor import MainWindow
 
 
-
 class Monitor:
     def __init__(self, args):
         self.key_manager = KeyHandlingManager()
         self.init_windows()
         self.godname = args.god_name
         self.dump_file = args.dump
+        self.state = {}
 
         curses.noecho()
         curses.cbreak()
 
         self.init_colors()
         self.init_keys()
-
-
 
     def __del__(self):
         curses.echo()
@@ -38,6 +36,7 @@ class Monitor:
 
     def init_keys(self):
         self.key_manager.register_handler('q', self.quit)
+        self.key_manager.register_handler(' ', self.remove_warning)
 
     def init_windows(self):
         self.stdscr = curses.initscr()
@@ -46,7 +45,7 @@ class Monitor:
         curses.start_color()
 
         self.main_window = MainWindow(self.stdscr)
-        self.warning = WarningWindow(self.stdscr, 'WARNING')
+        self.warnings = []
 
     def init_colors(self):
         curses.init_pair(Colors.STANDART,
@@ -113,16 +112,26 @@ class Monitor:
     def quit(self):
         sys.exit(0)
 
+    def remove_warning(self):
+        if len(self.warnings) != 0:
+            del self.warnings[-1]
+
+        self.main_window.update(self.state)
+
     def main_loop(self):
         timer = Timer(60)
-        state = json.loads(self.read_state())
-        self.main_window.update(state)
+        self.state = json.loads(self.read_state())
+        self.main_window.update(self.state)
 
         while(True):
             if timer.expired():
-                state = json.loads(self.read_state())
-                self.main_window.update(state)
+                self.state = json.loads(self.read_state())
+                self.main_window.update(self.state)
                 timer.reset()
+
+            if len(self.warnings) != 0:
+                self.warnings[-1].update({})
+
             self.handle_key()
             time.sleep(0.1)
 

@@ -10,7 +10,7 @@ class WarningWindow(MonitorWindowBase):
                  text):
 
         self._text = text
-        self._last_line = 'Press ENTER...'
+        self._last_line = 'Press SPACE...'
 
         # Include borders to window size
         width  = max(len(self._text), len(self._last_line)) + 2
