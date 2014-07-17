@@ -39,4 +39,5 @@ class WarningWindow(MonitorWindowBase):
 
     def init_text_entries(self):
         self.text_entries.append(TextEntry(self._text, '', self.width, Colors.ATTENTION))
+        self.text_entries.append(TextEntry('', '', self.width, Colors.ATTENTION))
         self.text_entries.append(TextEntry(self._last_line, '', self.width, Colors.ATTENTION))
