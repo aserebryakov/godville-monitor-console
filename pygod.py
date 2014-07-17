@@ -92,12 +92,14 @@ class Monitor:
 
     def read_dump(self, dumpfile):
         state = None
+
         try:
-            f = open(dumpfile, 'rb')
-            state = f.read()
-            f.close()
-        except:
-            print('Error occured')
+            with open(dumpfile, 'rb') as f:
+                state = f.read()
+        except IOError:
+            logging.error('%s: Error reading file %s',
+                          self.read_dump.__name__,
+                          dumpfile)
 
         return state
 
