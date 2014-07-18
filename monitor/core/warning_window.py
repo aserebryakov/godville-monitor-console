@@ -22,7 +22,7 @@ class WarningWindow(MonitorWindowBase):
         x = int((max_x - width)/2)
 
         if (x < 0 or y < 0):
-            logging.error('%s: Warning text is too long \'%s\'',
+            logging.error('%s: Text is too long \'%s\'',
                           self.__init__.__name__,
                           self._text)
             x = 0
