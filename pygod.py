@@ -8,10 +8,10 @@ import curses
 import logging
 from urllib.request import urlopen
 
-from core import Colors
-from core import Timer
-from core import KeyHandlingManager
-from core import WarningWindow
+from monitor import Colors
+from monitor import Timer
+from monitor import KeyHandlingManager
+from monitor import WarningWindow
 from monitor import MainWindow
 
 
