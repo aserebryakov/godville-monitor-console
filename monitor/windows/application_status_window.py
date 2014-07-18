@@ -1,7 +1,7 @@
 import curses
-from core import TiledWindow
-from core import TextEntry
-from core import Colors
+from ..core import TiledWindow
+from ..core import TextEntry
+from ..core import Colors
 
 
 class ApplicationStatusWindow(TiledWindow):
