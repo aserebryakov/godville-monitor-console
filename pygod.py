@@ -13,6 +13,8 @@ from monitor import Timer
 from monitor import KeyHandlingManager
 from monitor import WarningWindow
 from monitor import MainWindow
+from monitor import Rule
+from monitor import DictionaryChecker
 
 
 class Monitor:
