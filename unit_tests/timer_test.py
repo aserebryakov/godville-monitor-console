@@ -3,7 +3,7 @@ import sys
 import time
 import unittest
 sys.path.append(os.getcwd())
-from core import Timer
+from monitor import Timer
 
 class TimerTest(unittest.TestCase):
     def timer_test(self):
@@ -21,11 +21,9 @@ def suite():
     suite.addTest(TimerTest('timer_test'))
     return suite
 
-
 def run_all():
     runner = unittest.TextTestRunner()
     runner.run(suite())
-
 
 if __name__ == '__main__':
     run_all()

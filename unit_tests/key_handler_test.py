@@ -2,9 +2,9 @@ import os
 import sys
 import unittest
 sys.path.append(os.getcwd())
-from core import KeyHandlingManager
-from core import HandlerAlreadyRegisteredException
-from core import HandlerNotRegisteredException
+from monitor import KeyHandlingManager
+from monitor import HandlerAlreadyRegisteredException
+from monitor import HandlerNotRegisteredException
 
 class KeyHandlingManagerTestFixture(unittest.TestCase):
     def __init__(self, name):
