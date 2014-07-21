@@ -32,7 +32,7 @@ class Rule:
 
     def to_string(self):
         string = 'key = {0}, condition = {1}, ethalon = {2}, message = {3}'.\
-                 format(self.key, self.condition, ethalon, self.message)
+                 format(self.key, self.condition, self.ethalon, self.message)
 
     def check(self, value):
         '''
