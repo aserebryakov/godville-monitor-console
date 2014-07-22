@@ -31,6 +31,7 @@ class Monitor:
 
         self.init_colors()
         self.init_keys()
+        self.init_status_checkers()
 
     def __del__(self):
         curses.echo()
@@ -66,6 +67,10 @@ class Monitor:
         curses.init_pair(Colors.ATTENTION,
                          curses.COLOR_WHITE,
                          curses.COLOR_RED)
+
+    def init_status_checkers(self):
+        self.main_checker = DictionaryChecker()
+        self.main_checker.add_rule(Rule('health', '<', 40, 'Low Health'))
 
     def read_state(self):
         logging.debug('%s: reading state',
@@ -123,15 +128,23 @@ class Monitor:
 
         self.main_window.update(self.state)
 
+    def check_status(self, state):
+        warnings = self.main_checker.check_rules(state)
+
+        for warning in warnings:
+            self.warnings.append(WarningWindow(self.stdscr, warning))
+
     def main_loop(self):
         timer = Timer(60)
         self.state = json.loads(self.read_state())
         self.main_window.update(self.state)
+        self.check_status(self.state)
 
         while(True):
             if timer.expired():
                 self.state = json.loads(self.read_state())
                 self.main_window.update(self.state)
+                self.check_status(self.state)
                 timer.reset()
 
             if len(self.warnings) != 0:
@@ -178,3 +191,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
