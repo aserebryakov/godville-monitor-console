@@ -7,6 +7,7 @@ import json
 import curses
 import logging
 from urllib.request import urlopen
+from urllib.parse import quote_plus
 
 from core import Colors
 from core import Timer
@@ -75,7 +76,7 @@ class Monitor:
                 state = self.read_dump(self.dump_file).decode('utf-8')
             else:
                 state = self.read_form_url('http://godville.net/gods/api/{0}.json'
-                                           .format(self.godname))
+                                           .format(quote_plus(self.godname)))
         except Exception as e:
             logging.error('%s: reading state error \n %s',
                           self.read_state.__name__,
