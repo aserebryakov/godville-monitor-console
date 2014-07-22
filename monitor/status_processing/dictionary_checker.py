@@ -31,8 +31,10 @@ class DictionaryChecker:
         for rule in self.rules:
             if rule.key in dictionary.keys():
                 if rule.check(dictionary[rule.key]) == True:
-                    messages.append(rule.messages)
+                    messages.append(rule.message)
             else:
                 logging.debug('%s: Key not found : %s',
                               self.check_rules.__name__,
                               rule.key)
+
+        return messages
