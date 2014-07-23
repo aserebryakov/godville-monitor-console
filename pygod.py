@@ -49,7 +49,7 @@ class Monitor:
         curses.start_color()
 
         self.main_window = MainWindow(self.stdscr)
-        self.warnings = []
+        self.warning_windows = []
 
     def init_colors(self):
         curses.init_pair(Colors.STANDART,
@@ -69,8 +69,10 @@ class Monitor:
                          curses.COLOR_RED)
 
     def init_status_checkers(self):
-        self.main_checker = DictionaryChecker()
-        self.main_checker.add_rule(Rule('health', '<', 40, 'Low Health'))
+        self.hero_inspector = DictionaryChecker()
+        self.hero_inspector.add_rule(Rule('health', '<', 40, 'Low Health'))
+        self.hero_inspector.add_rule(Rule('arena_fight', '==', True, 'Hero in fight'))
+        self.hero_inspector.add_rule(Rule('expired', '==', True, 'Session is expired, please reconnect'))
 
     def read_state(self):
         logging.debug('%s: reading state',
@@ -123,16 +125,16 @@ class Monitor:
         sys.exit(0)
 
     def remove_warning(self):
-        if len(self.warnings) != 0:
-            del self.warnings[-1]
+        if len(self.warning_windows) != 0:
+            del self.warning_windows[-1]
 
         self.main_window.update(self.state)
 
     def check_status(self, state):
-        warnings = self.main_checker.check_rules(state)
+        warnings = self.hero_inspector.check_rules(state)
 
         for warning in warnings:
-            self.warnings.append(WarningWindow(self.stdscr, warning))
+            self.warning_windows.append(WarningWindow(self.stdscr, warning))
 
     def main_loop(self):
         timer = Timer(60)
@@ -147,8 +149,8 @@ class Monitor:
                 self.check_status(self.state)
                 timer.reset()
 
-            if len(self.warnings) != 0:
-                self.warnings[-1].update({})
+            if len(self.warning_windows) != 0:
+                self.warning_windows[-1].update({})
 
             self.handle_key()
             time.sleep(0.1)
