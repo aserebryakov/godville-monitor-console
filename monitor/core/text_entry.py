@@ -74,9 +74,7 @@ class TextEntry:
                 logging.warning('%s: Key not found \'%s\'',
                                 self.update.__name__,
                                 self.key)
-
-                self._text = '{0} key not found'.format(self.key)
-                return
+                custom_text = 'N/A'
 
         if key_width < 0:
             self._text = '{0} text doesn\'t fit'.format(self.key)
