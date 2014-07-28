@@ -16,8 +16,8 @@ class PetWindow(TiledWindow):
                                         left_window)
 
     def update(self, state):
-        pet = state['pet']
-        super(PetWindow, self).update(pet)
+        pet_status = state['pet_status']
+        super(PetWindow, self).update(pet_status)
 
     def init_text_entries(self):
         self.text_entries.append(TextEntry('', 'pet_class', self.width))

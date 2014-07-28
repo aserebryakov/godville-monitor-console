@@ -18,6 +18,9 @@ from monitor import Rule
 from monitor import DictionaryChecker
 from monitor import HeroStatusExtractor
 from monitor import ApplicationStatusExtractor
+from monitor import InventoryStatusExtractor
+from monitor import PetStatusExtractor
+from monitor import QuestStatusExtractor
 
 
 class Monitor:
@@ -74,6 +77,9 @@ class Monitor:
         self.info_extractors = []
         self.info_extractors.append(ApplicationStatusExtractor())
         self.info_extractors.append(HeroStatusExtractor())
+        self.info_extractors.append(InventoryStatusExtractor())
+        self.info_extractors.append(PetStatusExtractor())
+        self.info_extractors.append(QuestStatusExtractor())
 
     def read_state(self):
         logging.debug('%s: reading state',

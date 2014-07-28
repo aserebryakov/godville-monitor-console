@@ -20,9 +20,19 @@ class InventoryWindow(TiledWindow):
                                               top_window,
                                               left_window)
 
+    def update(self, state):
+        inventory_status = state['inventory_status']
+        super(InventoryWindow, self).update(inventory_status)
+
     def init_text_entries(self):
         self.text_entries.append(TextEntry('Bricks', 'bricks_cnt', self.width))
         self.text_entries.append(TextEntry('Wood', 'wood_cnt', self.width))
         self.text_entries.append(TextEntry('Inventory Items',
                                            'inventory_num',
+                                            self.width))
+        self.text_entries.append(TextEntry('High Cost Items',
+                                           'active_items',
+                                            self.width))
+        self.text_entries.append(TextEntry('Active Items',
+                                           'high_cost_items',
                                             self.width))
