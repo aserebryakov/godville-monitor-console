@@ -16,6 +16,7 @@ from monitor import WarningWindow
 from monitor import MainWindow
 from monitor import Rule
 from monitor import DictionaryChecker
+from monitor import HeroStatusExtractor
 
 
 class Monitor:
@@ -70,9 +71,8 @@ class Monitor:
 
     def init_status_checkers(self):
         self.hero_inspector = DictionaryChecker()
-        self.hero_inspector.add_rule(Rule('health', '<', 40, 'Low Health'))
-        self.hero_inspector.add_rule(Rule('arena_fight', '==', True, 'Hero in fight'))
         self.hero_inspector.add_rule(Rule('expired', '==', True, 'Session is expired, please reconnect'))
+        self.hero_status_extractor = HeroStatusExtractor()
 
     def read_state(self):
         logging.debug('%s: reading state',
@@ -133,20 +133,32 @@ class Monitor:
     def check_status(self, state):
         warnings = self.hero_inspector.check_rules(state)
 
+        self.hero_status_extractor.extract_info(state)
+        self.hero_status_extractor.inspect_info()
+
+        self.state[self.hero_status_extractor.name] = \
+                                            self.hero_status_extractor.info
+
+        warnings += self.hero_status_extractor.messages
+
+        logging.error('%s: %s',
+                      self.check_status.__name__,
+                      str(self.state))
+
         for warning in warnings:
             self.warning_windows.append(WarningWindow(self.stdscr, warning))
 
     def main_loop(self):
         timer = Timer(60)
         self.state = json.loads(self.read_state())
-        self.main_window.update(self.state)
         self.check_status(self.state)
+        self.main_window.update(self.state)
 
         while(True):
             if timer.expired():
                 self.state = json.loads(self.read_state())
-                self.main_window.update(self.state)
                 self.check_status(self.state)
+                self.main_window.update(self.state)
                 timer.reset()
 
             if len(self.warning_windows) != 0:
