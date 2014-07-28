@@ -17,6 +17,7 @@ from monitor import MainWindow
 from monitor import Rule
 from monitor import DictionaryChecker
 from monitor import HeroStatusExtractor
+from monitor import ApplicationStatusExtractor
 
 
 class Monitor:
@@ -70,9 +71,9 @@ class Monitor:
                          curses.COLOR_RED)
 
     def init_status_checkers(self):
-        self.hero_inspector = DictionaryChecker()
-        self.hero_inspector.add_rule(Rule('expired', '==', True, 'Session is expired, please reconnect'))
-        self.hero_status_extractor = HeroStatusExtractor()
+        self.info_extractors = []
+        self.info_extractors.append(ApplicationStatusExtractor())
+        self.info_extractors.append(HeroStatusExtractor())
 
     def read_state(self):
         logging.debug('%s: reading state',
@@ -131,19 +132,13 @@ class Monitor:
         self.main_window.update(self.state)
 
     def check_status(self, state):
-        warnings = self.hero_inspector.check_rules(state)
+        warnings = []
 
-        self.hero_status_extractor.extract_info(state)
-        self.hero_status_extractor.inspect_info()
-
-        self.state[self.hero_status_extractor.name] = \
-                                            self.hero_status_extractor.info
-
-        warnings += self.hero_status_extractor.messages
-
-        logging.error('%s: %s',
-                      self.check_status.__name__,
-                      str(self.state))
+        for extractor in self.info_extractors:
+            extractor.extract_info(state)
+            extractor.inspect_info()
+            self.state[extractor.name] = extractor.info
+            warnings += extractor.messages
 
         for warning in warnings:
             self.warning_windows.append(WarningWindow(self.stdscr, warning))

@@ -16,13 +16,7 @@ class ApplicationStatusWindow(TiledWindow):
                                                       left_window)
 
     def update(self, state):
-        try:
-            # fictive access to the field
-            state['expired']
-            state['session_status'] = 'Session is expired'
-        except KeyError as err:
-            state['session_status'] = 'Session is active'
-
+        state = state['application_status']
         super(ApplicationStatusWindow, self).update(state)
 
     def init_text_entries(self):
