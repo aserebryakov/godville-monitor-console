@@ -25,14 +25,15 @@ class InventoryWindow(TiledWindow):
         super(InventoryWindow, self).update(inventory_status)
 
     def init_text_entries(self):
+        self.text_entries.append(TextEntry('Gold', 'gold_approx', self.width))
         self.text_entries.append(TextEntry('Bricks', 'bricks_cnt', self.width))
         self.text_entries.append(TextEntry('Wood', 'wood_cnt', self.width))
-        self.text_entries.append(TextEntry('Inventory Items',
-                                           'inventory_num',
-                                            self.width))
-        self.text_entries.append(TextEntry('High Cost Items',
+        self.text_entries.append(TextEntry('Useful Items',
                                            'active_items',
                                             self.width))
-        self.text_entries.append(TextEntry('Active Items',
+        self.text_entries.append(TextEntry('High Cost Items',
                                            'high_cost_items',
+                                            self.width))
+        self.text_entries.append(TextEntry('Total Items',
+                                           'inventory_num',
                                             self.width))

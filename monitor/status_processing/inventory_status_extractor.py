@@ -1,3 +1,4 @@
+import logging
 from .rule import Rule
 from .info_extractor import InfoExtractor
 
@@ -12,7 +13,13 @@ class InventoryStatusExtractor(InfoExtractor):
         '''
         super(InventoryStatusExtractor, self).__init__('inventory_status')
 
-        self.keys = ['bricks_cnt', 'wood_cnt', 'inventory_num', 'inventory']
+        self.keys = ['bricks_cnt', 'wood_cnt', 'inventory_num', 'inventory',
+                     'gold_approx']
+
+        self.inspector.add_rule(Rule('active_items',
+                                     '>',
+                                     0,
+                                     'Hero got an item that can be activated'))
 
     def extract_info(self, status):
         '''
@@ -24,7 +31,16 @@ class InventoryStatusExtractor(InfoExtractor):
         active_items    = 0
         high_cost_items = 0
 
-        # TODO: add items processing
+        for item in self.info['inventory'].values():
+            logging.debug('%s: item %s',
+                          self.extract_info.__name__,
+                          str(item))
+
+            if item['price'] > 0:
+                high_cost_items += 1
+
+            if 'activate_by_user' in item.keys():
+                active_items += 1
 
         self.info['active_items']    = active_items
         self.info['high_cost_items'] = high_cost_items
