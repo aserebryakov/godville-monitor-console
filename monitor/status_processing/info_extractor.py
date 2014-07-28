@@ -21,7 +21,10 @@ class InfoExtractor:
         Should return dictionary of related elements
         '''
         for key in self.keys:
-            self.info[key] = status[key]
+            try:
+                self.info[key] = status[key]
+            except KeyError:
+                self.info[key] = 'N/A'
 
     def inspect_info(self):
         '''
