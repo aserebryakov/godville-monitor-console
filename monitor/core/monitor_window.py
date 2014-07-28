@@ -77,14 +77,31 @@ class MonitorWindowBase:
     def init_text_entries(self):
         pass
 
+    def split_text(self, text, length):
+        chunks = []
+
+        if len(text) == 0:
+            chunks.append('')
+
+        for i in range(0, len(text), length):
+            chunks.append(text[i:i + length])
+
+        return chunks
+
     def write_text(self, entries):
+        offset = 0
         for i, entry in enumerate(entries):
             logging.debug('%s: Writting text \'%s\'',
                           self.write_text.__name__,
                           entry.text)
 
-            self._window.addstr(i + 1,
-                                1,
-                                entry.text,
-                                curses.color_pair(entry.color))
+            chunks = self.split_text(entry.text, self.width - 2)
 
+            for j, chunk in enumerate(chunks):
+                self._window.addnstr(i + 1 + offset + j,
+                                    1,
+                                    chunk,
+                                    self.width - 2,
+                                    curses.color_pair(entry.color))
+
+            offset = len(chunks) - 1
