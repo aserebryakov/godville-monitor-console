@@ -6,7 +6,7 @@ Console monitor for Godville with an ascetic interface.
 Screenshot
 -----------------
 
-http://s3.postimg.org/3x6bafb83/pygod.png
+http://s15.postimg.org/w22alzh0b/Py_God.png
 
 
 New Features
