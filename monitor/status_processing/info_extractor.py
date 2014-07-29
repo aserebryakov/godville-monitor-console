@@ -1,3 +1,4 @@
+import logging
 from .dictionary_checker import DictionaryChecker
 
 class InfoExtractor:
@@ -24,6 +25,9 @@ class InfoExtractor:
             try:
                 self.info[key] = status[key]
             except KeyError:
+                logging.warning('%s: key is not found %s',
+                                self.extract_info.__name__,
+                                key)
                 self.info[key] = 'N/A'
 
     def inspect_info(self):
