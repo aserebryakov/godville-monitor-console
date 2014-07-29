@@ -88,20 +88,23 @@ class MonitorWindowBase:
 
         return chunks
 
+    def write_text_chunks(self, chunks, color, start_line):
+        for i, chunk in enumerate(chunks):
+            self._window.addnstr(start_line + i,
+                                1,
+                                chunk,
+                                self.width - 2,
+                                curses.color_pair(color))
+
+
     def write_text(self, entries):
-        offset = 0
+        offset = 1 # Offset for correcting line number for splitted text
+
         for i, entry in enumerate(entries):
             logging.debug('%s: Writting text \'%s\'',
                           self.write_text.__name__,
                           entry.text)
 
             chunks = self.split_text(entry.text, self.width - 2)
-
-            for j, chunk in enumerate(chunks):
-                self._window.addnstr(i + 1 + offset + j,
-                                    1,
-                                    chunk,
-                                    self.width - 2,
-                                    curses.color_pair(entry.color))
-
-            offset = len(chunks) - 1
+            self.write_text_chunks(chunks, entry.color, i + offset)
+            offset += len(chunks) - 1
