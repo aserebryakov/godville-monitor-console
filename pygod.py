@@ -31,6 +31,7 @@ class Monitor:
         self.godname = args.god_name
         self.dump_file = args.dump
         self.state = {}
+        self.notification_command = args.notification_command
 
         curses.noecho()
         try:
@@ -156,6 +157,8 @@ class Monitor:
             warnings += extractor.messages
 
         for warning in warnings:
+            if self.notification_command:
+                os.system(self.notification_command.format(warning)) # FIXME: Highly insecure!
             self.warning_windows.append(WarningWindow(self.stdscr, warning))
 
     def main_loop(self):
@@ -218,7 +221,10 @@ def main():
     settings.read(config_files)
     if args.god_name is None:
         if 'main' in settings and 'god_name' in settings['main']:
-            args.god_name = json.loads(settings.get('main', 'god_name')) # ha ha
+            args.god_name = json.loads(settings.get('main', 'god_name'))
+    args.notification_command = None
+    if 'main' in settings and 'notification_command' in settings['main']:
+        args.notification_command = json.loads(settings.get('main', 'notification_command'))
 
     # Configuring logs
     log_level = logging.WARNING
