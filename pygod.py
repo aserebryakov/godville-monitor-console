@@ -32,7 +32,11 @@ class Monitor:
         self.state = {}
 
         curses.noecho()
-        curses.cbreak()
+        try:
+            curses.cbreak()
+        except curses.error:
+            logging.error('curses error: cbreak returned ERR, probably invalid terminal. Try screen or tmux.')
+            pass
 
         self.init_colors()
         self.init_keys()
@@ -40,7 +44,11 @@ class Monitor:
 
     def __del__(self):
         curses.echo()
-        curses.nocbreak()
+        try:
+            curses.nocbreak()
+        except curses.error:
+            logging.error('curses error: cbreak returned ERR, probably invalid terminal. Try screen or tmux.')
+            pass
         curses.endwin()
 
     def init_keys(self):
