@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 
-import sys
+import sys, os
 import time
 import argparse
 import json
 import curses
 import logging
+import configparser
 from urllib.request import urlopen
 from urllib.parse import quote_plus
 
@@ -177,12 +178,25 @@ class Monitor:
             time.sleep(0.1)
 
 
+def get_config_file(*args):
+    xdg_config_dir = os.environ.get('XDG_CONFIG_HOME')
+    if not xdg_config_dir:
+        xdg_config_dir = os.path.join(os.path.expanduser("~"), ".config")
+    app_config_dir = os.path.join(xdg_config_dir, "pygod")
+    os.makedirs(app_config_dir, exist_ok=True)
+    return os.path.join(app_config_dir, "pygod.ini")
+
 def main():
     # Parsing arguments
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('god_name',
-                        help = 'Name of the god to me monitored')
+    parser.add_argument('god_name', nargs='?',
+                        help = 'Name of the god to me monitored. Overrides value from config file.')
+
+    parser.add_argument('-c',
+                        '--config',
+                        type = str,
+                        help = 'loads config file (default location is XDG_CONFIG_HOME/pygod/pygod.ini')
 
     parser.add_argument('-d',
                         '--dump',
@@ -196,6 +210,16 @@ def main():
 
     args = parser.parse_args()
 
+    # Config.
+    config_files = [get_config_file()]
+    if args.config:
+        config_files.append(args.config)
+    settings = configparser.SafeConfigParser()
+    settings.read(config_files)
+    if args.god_name is None:
+        if 'main' in settings and 'god_name' in settings['main']:
+            args.god_name = json.loads(settings.get('main', 'god_name')) # ha ha
+
     # Configuring logs
     log_level = logging.WARNING
 
@@ -206,8 +230,12 @@ def main():
                         filename='pygod.log',
                         filemode='w+',
                         level=log_level)
-    logging.debug('Starting PyGod with username %s', args.god_name)
 
+    if args.god_name is None:
+        print('God name must be specified either via command line or using config file!')
+        sys.exit(1)
+
+    logging.debug('Starting PyGod with username %s', args.god_name)
     monitor = Monitor(args)
     monitor.main_loop()
 
