@@ -23,6 +23,11 @@ from monitor import InventoryStatusExtractor
 from monitor import PetStatusExtractor
 from monitor import QuestStatusExtractor
 
+def unquote_string(string):
+    if string.startswith('"') and string.endswith('"'):
+        string = string[1:-1]
+    # Apparently 'unicode_escape' returns string with corrupted utf-8 encoding.
+    return bytes(string, "utf-8").decode('unicode_escape').encode("latin1").decode("utf-8")
 
 class Monitor:
     def __init__(self, args):
@@ -32,6 +37,7 @@ class Monitor:
         self.dump_file = args.dump
         self.state = {}
         self.notification_command = args.notification_command
+        self.browser = args.browser if args.browser else "x-www-browser"
 
         curses.noecho()
         try:
@@ -55,6 +61,7 @@ class Monitor:
 
     def init_keys(self):
         self.key_manager.register_handler('q', self.quit)
+        self.key_manager.register_handler('f', self.open_browser)
         self.key_manager.register_handler(' ', self.remove_warning)
 
     def init_windows(self):
@@ -141,6 +148,9 @@ class Monitor:
     def quit(self):
         sys.exit(0)
 
+    def open_browser(self):
+        os.system("{0} http://godville.net/superhero".format(self.browser)) # FIXME also unsafe!
+
     def remove_warning(self):
         if len(self.warning_windows) != 0:
             del self.warning_windows[-1]
@@ -221,10 +231,13 @@ def main():
     settings.read(config_files)
     if args.god_name is None:
         if 'main' in settings and 'god_name' in settings['main']:
-            args.god_name = json.loads(settings.get('main', 'god_name'))
+            args.god_name = unquote_string(settings.get('main', 'god_name'))
     args.notification_command = None
     if 'main' in settings and 'notification_command' in settings['main']:
-        args.notification_command = json.loads(settings.get('main', 'notification_command'))
+        args.notification_command = unquote_string(settings.get('main', 'notification_command'))
+    args.browser = None
+    if 'main' in settings and 'browser' in settings['main']:
+        args.browser = unquote_string(settings.get('main', 'browser'))
 
     # Configuring logs
     log_level = logging.WARNING
