@@ -1,2 +1,2 @@
 #!/bin/sh
-python3 pygod.py
+python3 "$(dirname ${0})/pygod.py"
