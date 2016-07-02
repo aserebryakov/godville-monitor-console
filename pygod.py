@@ -199,6 +199,14 @@ def get_config_file(*args):
     os.makedirs(app_config_dir, exist_ok=True)
     return os.path.join(app_config_dir, "pygod.ini")
 
+def get_data_dir(*args):
+    xdg_data_dir = os.environ.get('XDG_DATA_HOME')
+    if not xdg_data_dir:
+        xdg_data_dir = os.path.join(os.path.expanduser("~"), ".local", "share")
+    app_data_dir = os.path.join(xdg_data_dir, "pygod")
+    os.makedirs(app_data_dir, exist_ok=True)
+    return app_data_dir
+
 def main():
     # Parsing arguments
     parser = argparse.ArgumentParser()
@@ -224,13 +232,15 @@ def main():
     args = parser.parse_args()
 
     # Config.
-    config_files = [get_config_file()]
+    config_files = [get_config_file(), os.path.join(get_data_dir(), "auth.cfg")]
     if args.config:
         config_files.append(args.config)
     settings = configparser.SafeConfigParser()
     settings.read(config_files)
     if args.god_name is None:
-        if 'main' in settings and 'god_name' in settings['main']:
+        if 'auth' in settings and 'god_name' in settings['auth']:
+            args.god_name = unquote_string(settings.get('auth', 'god_name'))
+        elif 'main' in settings and 'god_name' in settings['main']:
             args.god_name = unquote_string(settings.get('main', 'god_name'))
     args.notification_command = None
     if 'main' in settings and 'notification_command' in settings['main']:
@@ -246,8 +256,8 @@ def main():
         log_level = logging.DEBUG
 
     logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
-                        filename='pygod.log',
-                        filemode='w+',
+                        filename=os.path.join(get_data_dir(), 'pygod.log'),
+                        filemode='a+',
                         level=log_level)
 
     if args.god_name is None:
