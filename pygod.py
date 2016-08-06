@@ -34,7 +34,7 @@ class Monitor:
         self.key_manager = KeyHandlingManager()
         self.init_windows()
         self.godname = args.god_name
-        self.dump_file = args.dump
+        self.dump_file = args.state
         self.state = {}
         self.notification_command = args.notification_command
         self.browser = args.browser if args.browser else "x-www-browser"
@@ -219,10 +219,15 @@ def main():
                         type = str,
                         help = 'loads config file (default location is XDG_CONFIG_HOME/pygod/pygod.ini')
 
+    parser.add_argument('-s',
+                        '--state',
+                        type = str,
+                        help = 'read state from the dump file (debug option)')
+
     parser.add_argument('-d',
                         '--dump',
-                        type = str,
-                        help = 'read state from the dump (debug option)')
+                        action = 'store_true',
+                        help = 'dump state to file and exit (debug option)')
 
     parser.add_argument('-D',
                         '--debug',
@@ -265,8 +270,22 @@ def main():
         sys.exit(1)
 
     logging.debug('Starting PyGod with username %s', args.god_name)
-    monitor = Monitor(args)
-    monitor.main_loop()
+
+    if args.dump:
+        state = None
+        if args.state:
+            with open(args.state, 'rb') as f:
+                state = f.read().decode('utf-8')
+        else:
+            url = 'http://godville.net/gods/api/{0}.json'.format(quote_plus(args.god_name))
+            connection = urlopen(url)
+            state = connection.read().decode('utf-8')
+        prettified_state = json.dumps(json.loads(state), indent=4, ensure_ascii=False)
+        with open('{0}.json'.format(args.god_name), 'wb') as f:
+            f.write(prettified_state.encode('utf-8'))
+    else:
+        monitor = Monitor(args)
+        monitor.main_loop()
 
 
 if __name__ == '__main__':
