@@ -12,7 +12,6 @@ from urllib.parse import quote_plus
 
 from monitor import Colors
 from monitor import Timer
-from monitor import KeyHandlingManager
 from monitor import WarningWindow
 from monitor import MainWindow
 from monitor import Rule
@@ -31,7 +30,7 @@ def unquote_string(string):
 
 class Monitor:
     def __init__(self, args):
-        self.key_manager = KeyHandlingManager()
+        self.controls = {}
         self.init_windows()
         self.godname = args.god_name
         self.dump_file = args.state
@@ -60,9 +59,9 @@ class Monitor:
         curses.endwin()
 
     def init_keys(self):
-        self.key_manager.register_handler('q', self.quit)
-        self.key_manager.register_handler('f', self.open_browser)
-        self.key_manager.register_handler(' ', self.remove_warning)
+        self.controls['q'] = self.quit
+        self.controls['f'] = self.open_browser
+        self.controls[' '] = self.remove_warning
 
     def init_windows(self):
         self.stdscr = curses.initscr()
@@ -140,7 +139,8 @@ class Monitor:
     def handle_key(self):
         try:
             key = self.stdscr.getkey()
-            self.key_manager.handle_key(key)
+            if key in self.controls:
+                self.controls[key]()
         except curses.error as e:
             if not 'no input' in e.args:
                 raise
