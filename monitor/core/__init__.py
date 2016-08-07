@@ -1,4 +1,3 @@
-from .timer import Timer
 from .tiled_window import TiledWindow
 from .warning_window import WarningWindow
 

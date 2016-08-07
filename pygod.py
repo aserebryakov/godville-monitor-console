@@ -11,7 +11,6 @@ from urllib.request import urlopen
 from urllib.parse import quote_plus
 
 from monitor import Colors
-from monitor import Timer
 from monitor import WarningWindow
 from monitor import MainWindow
 from monitor import Rule
@@ -172,17 +171,19 @@ class Monitor:
             self.warning_windows.append(WarningWindow(self.stdscr, warning))
 
     def main_loop(self):
-        timer = Timer(60)
+        UPDATE_INTERVAL = 59
+        last_update_time = time.time()
+
         self.state = json.loads(self.read_state())
         self.check_status(self.state)
         self.main_window.update(self.state)
 
         while(True):
-            if timer.expired():
+            if last_update_time + UPDATE_INTERVAL < time.time():
+                last_update_time = time.time()
                 self.state = json.loads(self.read_state())
                 self.check_status(self.state)
                 self.main_window.update(self.state)
-                timer.reset()
 
             if len(self.warning_windows) != 0:
                 self.warning_windows[-1].update({})
