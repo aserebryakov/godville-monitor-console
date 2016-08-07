@@ -9,44 +9,12 @@ class Colors:
 
 class TextEntry:
     def __init__(self, predefined_text, key, width, color = Colors.STANDART):
-        self._predefined_text = predefined_text
-        self._key             = key
-        self._width           = width
-        self._color           = color
-        self._attribute       = None
-        self._text            = ''
-
-    @property
-    def predefined_text(self):
-        return self._predefined_text
-
-    @property
-    def width(self):
-        return self._width
-
-    @property
-    def key(self):
-        return self._key
-
-    @property
-    def text(self):
-        return self._text
-
-    @property
-    def text(self):
-        return self._text
-
-    @property
-    def color(self):
-        return self._color
-
-    @property
-    def attribute(self):
-        return self._attribute
-
-    @property
-    def attribute(self, attribute):
-        self._attribute = attribute
+        self.predefined_text = predefined_text
+        self.key             = key
+        self.width           = width
+        self.color           = color
+        self.attribute       = None
+        self.text            = ''
 
     def update(self, state, attribute = None):
         logging.debug('%s: Updating entry \'%s\'',
@@ -58,7 +26,7 @@ class TextEntry:
         text_format = '{0}{1:>{2}}'
 
         if self.key == '' and self.predefined_text == '':
-            self._text = ''
+            self.text = ''
             return
 
         # In case of empty predefined text use center alignment
@@ -77,10 +45,10 @@ class TextEntry:
                 custom_text = 'N/A'
 
         if key_width < 0:
-            self._text = '{0} text doesn\'t fit'.format(self.key)
+            self.text = '{0} text doesn\'t fit'.format(self.key)
             return
 
-        self._text = text_format.format(self.predefined_text,
+        self.text = text_format.format(self.predefined_text,
                                         custom_text,
                                         key_width)
 

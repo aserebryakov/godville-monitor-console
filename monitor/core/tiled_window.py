@@ -13,8 +13,8 @@ class TiledWindow(MonitorWindowBase):
                  top_window = None,
                  left_window = None):
 
-        self._top_window   = top_window
-        self._left_window  = left_window
+        self.top_window   = top_window
+        self.left_window  = left_window
 
         window_y = 0
         window_x = 0
@@ -31,11 +31,3 @@ class TiledWindow(MonitorWindowBase):
                                           parent_window,
                                           window_y,
                                           window_x)
-
-    @property
-    def top_window(self):
-        return self._top_window
-
-    @property
-    def left_window(self):
-        return self._left_window

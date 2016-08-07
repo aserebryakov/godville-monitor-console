@@ -8,27 +8,11 @@ class Rule:
     __allowed_conditions = ['<', '<=', '==', '!=', '>=', '>']
 
     def __init__(self, key, condition, ethalon, message):
-        self._key         = key
-        self._condition   = condition
-        self._ethalon     = ethalon
-        self._message     = message
+        self.key         = key
+        self.condition   = condition
+        self.ethalon     = ethalon
+        self.message     = message
         self._last_result = False
-
-    @property
-    def key(self):
-        return self._key
-
-    @property
-    def condition(self):
-        return self._condition
-
-    @property
-    def ethalon(self):
-        return self._ethalon
-
-    @property
-    def message(self):
-        return self._message
 
     def to_string(self):
         string = 'key = {0}, condition = {1}, ethalon = {2}, message = {3}'.\
