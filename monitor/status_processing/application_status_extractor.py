@@ -14,7 +14,7 @@ class ApplicationStatusExtractor(InfoExtractor):
 
         self.keys = ['expired']
 
-        self.inspector.add_rule(Rule('expired',
+        self.rules.append(Rule('expired',
                                      '==',
                                      True,
                                      'Session is expired. Please reconnect.'))

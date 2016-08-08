@@ -14,7 +14,6 @@ from monitor import Colors
 from monitor import WarningWindow
 from monitor import MainWindow
 from monitor import Rule
-from monitor import DictionaryChecker
 from monitor import HeroStatusExtractor
 from monitor import ApplicationStatusExtractor
 from monitor import InventoryStatusExtractor

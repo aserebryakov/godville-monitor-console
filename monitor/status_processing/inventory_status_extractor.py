@@ -16,7 +16,7 @@ class InventoryStatusExtractor(InfoExtractor):
         self.keys = ['bricks_cnt', 'wood_cnt', 'inventory_num', 'inventory',
                      'gold_approx']
 
-        self.inspector.add_rule(Rule('active_items',
+        self.rules.append(Rule('active_items',
                                      '>',
                                      0,
                                      'Hero got an item that can be activated'))

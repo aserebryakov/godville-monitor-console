@@ -15,8 +15,8 @@ class HeroStatusExtractor(InfoExtractor):
         self.keys = ['name', 'health', 'max_health', 'godpower',
                      'exp_progress', 'town_name', 'distance', 'arena_fight']
 
-        self.inspector.add_rule(Rule('health', '<', 40, 'Low Health'))
-        self.inspector.add_rule(Rule('arena_fight',
+        self.rules.append(Rule('health', '<', 40, 'Low Health'))
+        self.rules.append(Rule('arena_fight',
                                      '==',
                                      True,
                                      'Hero is in fight'))

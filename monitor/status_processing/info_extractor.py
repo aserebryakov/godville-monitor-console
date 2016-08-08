@@ -1,5 +1,4 @@
 import logging
-from .dictionary_checker import DictionaryChecker
 
 class InfoExtractor:
     '''
@@ -10,7 +9,7 @@ class InfoExtractor:
         '''
         Constructor
         '''
-        self.inspector = DictionaryChecker()
+        self.rules = []
         self.name      = name
         self.keys      = []
         self.messages  = []
@@ -34,5 +33,15 @@ class InfoExtractor:
         '''
         Function checking info with rules
         '''
-        self.messages = self.inspector.check_rules(self.info)
+        self.messages = []
+
+        for rule in self.rules:
+            if rule.key in self.info.keys():
+                if rule.check(self.info[rule.key]) == True:
+                    self.messages.append(rule.message)
+            else:
+                logging.debug('%s: Key not found : %s',
+                              self.inspect_info.__name__,
+                              rule.key)
+
 
