@@ -14,11 +14,7 @@ from monitor import Colors
 from monitor import WarningWindow
 from monitor import MainWindow
 from monitor import Rule
-from monitor import HeroStatusExtractor
-from monitor import ApplicationStatusExtractor
-from monitor import InventoryStatusExtractor
-from monitor import PetStatusExtractor
-from monitor import QuestStatusExtractor
+from monitor import InfoExtractor
 
 def unquote_string(string):
     if string.startswith('"') and string.endswith('"'):
@@ -89,13 +85,13 @@ class Monitor:
 
     def init_status_checkers(self):
         self.info_extractors = []
-        application_status = ApplicationStatusExtractor()
+        application_status = InfoExtractor('application_status')
         application_status.rules.append(Rule(
             lambda info: 'expired' in info and info['expired'],
             lambda: application_status.messages.append('Session is expired. Please reconnect.')
             ))
         self.info_extractors.append(application_status)
-        hero_status = HeroStatusExtractor()
+        hero_status = InfoExtractor('hero_status')
         hero_status.rules.append(Rule(
             lambda info: 'health' in info and info['health'] < 40,
             lambda: hero_status.messages.append('Low Health')
@@ -105,14 +101,14 @@ class Monitor:
             lambda: hero_status.messages.append('Hero is in fight')
             ))
         self.info_extractors.append(hero_status)
-        inventory_status = InventoryStatusExtractor()
+        inventory_status = InfoExtractor('inventory_status')
         inventory_status.rules.append(Rule(
-            lambda info: 'active_items' in info and info['active_items'] > 0,
+            lambda info: sum([(1 if 'activate_by_user' in item else 0) for item in info['inventory'].values()]) > 0,
             lambda: inventory_status.messages.append('Hero got an item that can be activated')
             ))
         self.info_extractors.append(inventory_status)
-        self.info_extractors.append(PetStatusExtractor())
-        self.info_extractors.append(QuestStatusExtractor())
+        self.info_extractors.append(InfoExtractor('pet_status'))
+        self.info_extractors.append(InfoExtractor('quest_status'))
 
     def read_state(self):
         logging.debug('%s: reading state',

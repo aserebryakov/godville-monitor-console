@@ -2,8 +2,4 @@ from .core import Colors
 from .core import WarningWindow
 from .windows import MainWindow
 from .status_processing import Rule
-from .status_processing import HeroStatusExtractor
-from .status_processing import ApplicationStatusExtractor
-from .status_processing import InventoryStatusExtractor
-from .status_processing import PetStatusExtractor
-from .status_processing import QuestStatusExtractor
+from .status_processing import InfoExtractor

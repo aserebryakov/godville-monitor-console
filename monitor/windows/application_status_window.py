@@ -21,5 +21,5 @@ class ApplicationStatusWindow(TiledWindow):
 
     def init_text_entries(self):
         self.text_entries.append(TextEntry('',
-                                           'session_status',
+            lambda state: 'Session is expired' if 'expired' in state else 'Session is active',
                                            self.width))

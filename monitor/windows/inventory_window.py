@@ -29,10 +29,10 @@ class InventoryWindow(TiledWindow):
         self.text_entries.append(TextEntry('Bricks', 'bricks_cnt', self.width))
         self.text_entries.append(TextEntry('Wood', 'wood_cnt', self.width))
         self.text_entries.append(TextEntry('Useful Items',
-                                           'active_items',
+            lambda state: sum([(1 if 'activate_by_user' in item else 0) for item in state['inventory'].values()]),
                                             self.width))
         self.text_entries.append(TextEntry('High Cost Items',
-                                           'high_cost_items',
+            lambda state: sum([(1 if item['price'] > 0 else 0) for item in state['inventory'].values()]),
                                             self.width))
         self.text_entries.append(TextEntry('Total Items',
                                            'inventory_num',

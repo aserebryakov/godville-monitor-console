@@ -25,17 +25,19 @@ class TextEntry:
         custom_text = ''
         text_format = '{0}{1:>{2}}'
 
-        if self.key == '' and self.predefined_text == '':
+        if isinstance(self.key, str) and self.key == '' and self.predefined_text == '':
             self.text = ''
             return
 
         # In case of empty predefined text use center alignment
         if self.predefined_text == '':
             text_format = '{0}{1:^{2}}'
-        elif self.key == '':
+        elif isinstance(self.key, str) and self.key == '':
             text_format = '{0:^{2}}'
 
-        if self.key != '':
+        if not isinstance(self.key, str):
+            custom_text = self.key(state)
+        elif self.key != '':
             try:
                 custom_text = '{0}'.format(state[self.key])
             except KeyError:
