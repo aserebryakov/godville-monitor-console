@@ -11,7 +11,6 @@ class InfoExtractor:
         '''
         self.rules = []
         self.name      = name
-        self.keys      = []
         self.messages  = []
         self.info      = {}
 
@@ -20,14 +19,7 @@ class InfoExtractor:
         Method extracting necessary info from status dictionary.
         Should return dictionary of related elements
         '''
-        for key in self.keys:
-            try:
-                self.info[key] = status[key]
-            except KeyError:
-                logging.warning('%s: key is not found %s',
-                                self.extract_info.__name__,
-                                key)
-                self.info[key] = 'N/A'
+        self.info = status
 
     def inspect_info(self):
         '''

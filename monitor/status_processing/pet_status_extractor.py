@@ -11,8 +11,6 @@ class PetStatusExtractor(InfoExtractor):
         '''
         super(PetStatusExtractor, self).__init__('pet_status')
 
-        self.keys = ['pet_class', 'pet_name', 'pet_level']
-
     def extract_info(self, status):
         '''
         Method extracting necessary info from status dictionary.

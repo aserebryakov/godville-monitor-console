@@ -11,5 +11,3 @@ class QuestStatusExtractor(InfoExtractor):
         '''
         super(QuestStatusExtractor, self).__init__('quest_status')
 
-        self.keys = ['quest', 'quest_progress', 'diary_last']
-

@@ -12,9 +12,6 @@ class HeroStatusExtractor(InfoExtractor):
         '''
         super(HeroStatusExtractor, self).__init__('hero_status')
 
-        self.keys = ['name', 'health', 'max_health', 'godpower',
-                     'exp_progress', 'town_name', 'distance', 'arena_fight']
-
         self.rules.append(Rule(
             lambda info: 'health' in info and info['health'] < 40,
             lambda: self.messages.append('Low Health')
