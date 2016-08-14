@@ -36,12 +36,6 @@ class InfoExtractor:
         self.messages = []
 
         for rule in self.rules:
-            if rule.key in self.info.keys():
-                if rule.check(self.info[rule.key]) == True:
-                    self.messages.append(rule.message)
-            else:
-                logging.debug('%s: Key not found : %s',
-                              self.inspect_info.__name__,
-                              rule.key)
+            rule.check(self.info)
 
 

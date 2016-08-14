@@ -14,10 +14,10 @@ class ApplicationStatusExtractor(InfoExtractor):
 
         self.keys = ['expired']
 
-        self.rules.append(Rule('expired',
-                                     '==',
-                                     True,
-                                     'Session is expired. Please reconnect.'))
+        self.rules.append(Rule(
+            lambda info: 'expired' in info and info['expired'] > 0,
+            lambda: self.messages.append('Session is expired. Please reconnect.')
+            ))
 
     def extract_info(self, status):
         '''

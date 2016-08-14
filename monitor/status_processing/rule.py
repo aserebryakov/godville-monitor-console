@@ -5,46 +5,29 @@ class Rule:
     Class describing how to process dictinary item
     '''
 
-    __allowed_conditions = ['<', '<=', '==', '!=', '>=', '>']
-
-    def __init__(self, key, condition, ethalon, message):
-        self.key         = key
-        self.condition   = condition
-        self.ethalon     = ethalon
-        self.message     = message
+    def __init__(self, condition, action):
+        self.condition = condition
+        self.action = action
         self._last_result = False
 
-    def to_string(self):
-        string = 'key = {0}, condition = {1}, ethalon = {2}, message = {3}'.\
-                 format(self.key, self.condition, self.ethalon, self.message)
-
-    def check(self, value):
-        '''
-        Checks if condition is satisfied and last result was False
-        '''
-        if ((type(value) is not int) and (type(value) is not bool)):
-            logging.error('%s: incorrect value type %s',
+    def check(self, hero_state):
+        try:
+            result = self.condition(hero_state)
+        except Exception as e:
+            logging.error('%s: exception in condition: %s',
                           self.check.__name__,
-                          str(type(value)))
-            return False
-
-        if ((type(self.ethalon) is not int) and (type(self.ethalon) is not bool)):
-            logging.error('%s: incorrect ethalon type %s',
-                          self.check.__name__,
-                          str(type(self.ethalon)))
-            return False
-
-        if self.condition not in self.__allowed_conditions:
-            logging.error('%s: incorrect condition %s',
-                          self.check.__name__,
-                          str(type(self.condition)))
-            return False
-
-        result = eval(str(value) + str(self.condition) + str(self.ethalon))
+                          str(e))
+            return None
 
         if self._last_result != result:
             self._last_result = result
+            if result:
+                try:
+                    self.action()
+                except Exception as e:
+                    logging.error('%s: exception in action: %s',
+                                  self.check.__name__,
+                                  str(e))
             return result
 
-        return False
-
+        return None
