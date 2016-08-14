@@ -12,11 +12,6 @@ class ApplicationStatusExtractor(InfoExtractor):
         '''
         super(ApplicationStatusExtractor, self).__init__('application_status')
 
-        self.rules.append(Rule(
-            lambda info: 'expired' in info and info['expired'],
-            lambda: self.messages.append('Session is expired. Please reconnect.')
-            ))
-
     def extract_info(self, status):
         '''
         Method extracting necessary info from status dictionary.

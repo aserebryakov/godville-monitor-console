@@ -13,11 +13,6 @@ class InventoryStatusExtractor(InfoExtractor):
         '''
         super(InventoryStatusExtractor, self).__init__('inventory_status')
 
-        self.rules.append(Rule(
-            lambda info: 'active_items' in info and info['active_items'] > 0,
-            lambda: self.messages.append('Hero got an item that can be activated')
-            ))
-
     def extract_info(self, status):
         '''
         Method extracting necessary info from status dictionary.

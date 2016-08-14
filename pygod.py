@@ -89,9 +89,28 @@ class Monitor:
 
     def init_status_checkers(self):
         self.info_extractors = []
-        self.info_extractors.append(ApplicationStatusExtractor())
-        self.info_extractors.append(HeroStatusExtractor())
-        self.info_extractors.append(InventoryStatusExtractor())
+        application_status = ApplicationStatusExtractor()
+        application_status.rules.append(Rule(
+            lambda info: 'expired' in info and info['expired'],
+            lambda: application_status.messages.append('Session is expired. Please reconnect.')
+            ))
+        self.info_extractors.append(application_status)
+        hero_status = HeroStatusExtractor()
+        hero_status.rules.append(Rule(
+            lambda info: 'health' in info and info['health'] < 40,
+            lambda: hero_status.messages.append('Low Health')
+            ))
+        hero_status.rules.append(Rule(
+            lambda info: 'arena_fight' in info and info['arena_fight'],
+            lambda: hero_status.messages.append('Hero is in fight')
+            ))
+        self.info_extractors.append(hero_status)
+        inventory_status = InventoryStatusExtractor()
+        inventory_status.rules.append(Rule(
+            lambda info: 'active_items' in info and info['active_items'] > 0,
+            lambda: inventory_status.messages.append('Hero got an item that can be activated')
+            ))
+        self.info_extractors.append(inventory_status)
         self.info_extractors.append(PetStatusExtractor())
         self.info_extractors.append(QuestStatusExtractor())
 

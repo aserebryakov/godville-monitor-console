@@ -10,12 +10,3 @@ class PetStatusExtractor(InfoExtractor):
         Constructor
         '''
         super(PetStatusExtractor, self).__init__('pet_status')
-
-    def extract_info(self, status):
-        '''
-        Method extracting necessary info from status dictionary.
-        returns dictionary of related elements
-        '''
-        pet = status['pet']
-        super(PetStatusExtractor, self).extract_info(pet)
-
