@@ -281,8 +281,10 @@ def main():
             connection = urlopen(url)
             state = connection.read().decode('utf-8')
         prettified_state = json.dumps(json.loads(state), indent=4, ensure_ascii=False)
-        with open('{0}.json'.format(args.god_name), 'wb') as f:
+        dump_file = '{0}.json'.format(args.god_name)
+        with open(dump_file, 'wb') as f:
             f.write(prettified_state.encode('utf-8'))
+        print('Dumped current state to {0}.'.format(dump_file))
     else:
         monitor = Monitor(args)
         monitor.main_loop()
