@@ -39,6 +39,3 @@ class StatusWindow(TiledWindow):
         self.text_entries.append(TextEntry('Town', 'town_name', self.width))
         self.text_entries.append(TextEntry('Distance', 'distance', self.width))
 
-
-    def update(self, state):
-        super(StatusWindow, self).update(state)

@@ -20,9 +20,6 @@ class InventoryWindow(TiledWindow):
                                               top_window,
                                               left_window)
 
-    def update(self, state):
-        super(InventoryWindow, self).update(state)
-
     def init_text_entries(self):
         self.text_entries.append(TextEntry('Gold', 'gold_approx', self.width))
         self.text_entries.append(TextEntry('Bricks', 'bricks_cnt', self.width))
@@ -36,3 +33,4 @@ class InventoryWindow(TiledWindow):
         self.text_entries.append(TextEntry('Total Items',
                                            'inventory_num',
                                             self.width))
+

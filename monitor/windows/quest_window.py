@@ -34,5 +34,3 @@ class QuestWindow(TiledWindow):
                                            'diary_last',
                                            self.width))
 
-    def update(self, state):
-        super(QuestWindow, self).update(state)

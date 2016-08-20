@@ -15,9 +15,6 @@ class ApplicationStatusWindow(TiledWindow):
                                                       top_window,
                                                       left_window)
 
-    def update(self, state):
-        super(ApplicationStatusWindow, self).update(state)
-
     def init_text_entries(self):
         self.text_entries.append(TextEntry('',
             lambda state: 'Session is expired' if 'expired' in state else 'Session is active',
