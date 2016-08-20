@@ -41,5 +41,4 @@ class StatusWindow(TiledWindow):
 
 
     def update(self, state):
-        hero_status = state['hero_status']
-        super(StatusWindow, self).update(hero_status)
+        super(StatusWindow, self).update(state)

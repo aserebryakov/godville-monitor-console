@@ -35,5 +35,4 @@ class QuestWindow(TiledWindow):
                                            self.width))
 
     def update(self, state):
-        quest_status = state['quest_status']
-        super(QuestWindow, self).update(quest_status)
+        super(QuestWindow, self).update(state)

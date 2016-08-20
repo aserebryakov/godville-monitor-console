@@ -14,7 +14,6 @@ from monitor import Colors
 from monitor import WarningWindow
 from monitor import MainWindow
 from monitor import Rule
-from monitor import InfoExtractor
 
 def unquote_string(string):
     if string.startswith('"') and string.endswith('"'):
@@ -31,6 +30,7 @@ class Monitor:
         self.state = {}
         self.notification_command = args.notification_command
         self.browser = args.browser if args.browser else "x-www-browser"
+        self.rules = []
 
         curses.noecho()
         try:
@@ -83,32 +83,34 @@ class Monitor:
                          curses.COLOR_WHITE,
                          curses.COLOR_RED)
 
+    def post_warning(self, warning_message):
+        if self.notification_command:
+            os.system(self.notification_command.format(warning_message)) # FIXME: Highly insecure!
+        self.warning_windows.append(WarningWindow(self.stdscr, warning_message))
+
+    def remove_warning(self):
+        if len(self.warning_windows) != 0:
+            del self.warning_windows[-1]
+
+        self.main_window.update(self.state)
+
     def init_status_checkers(self):
-        self.info_extractors = []
-        application_status = InfoExtractor('application_status')
-        application_status.rules.append(Rule(
+        self.rules.append(Rule(
             lambda info: 'expired' in info and info['expired'],
-            lambda: application_status.messages.append('Session is expired. Please reconnect.')
+            lambda: self.post_warning('Session is expired. Please reconnect.')
             ))
-        self.info_extractors.append(application_status)
-        hero_status = InfoExtractor('hero_status')
-        hero_status.rules.append(Rule(
+        self.rules.append(Rule(
             lambda info: 'health' in info and info['health'] < 40,
-            lambda: hero_status.messages.append('Low Health')
+            lambda: self.post_warning('Low Health')
             ))
-        hero_status.rules.append(Rule(
+        self.rules.append(Rule(
             lambda info: 'arena_fight' in info and info['arena_fight'],
-            lambda: hero_status.messages.append('Hero is in fight')
+            lambda: self.post_warning('Hero is in fight')
             ))
-        self.info_extractors.append(hero_status)
-        inventory_status = InfoExtractor('inventory_status')
-        inventory_status.rules.append(Rule(
+        self.rules.append(Rule(
             lambda info: sum([(1 if 'activate_by_user' in item else 0) for item in info['inventory'].values()]) > 0,
-            lambda: inventory_status.messages.append('Hero got an item that can be activated')
+            lambda: self.post_warning('Hero got an item that can be activated')
             ))
-        self.info_extractors.append(inventory_status)
-        self.info_extractors.append(InfoExtractor('pet_status'))
-        self.info_extractors.append(InfoExtractor('quest_status'))
 
     def read_state(self):
         logging.debug('%s: reading state',
@@ -164,25 +166,9 @@ class Monitor:
     def open_browser(self):
         os.system("{0} http://godville.net/superhero".format(self.browser)) # FIXME also unsafe!
 
-    def remove_warning(self):
-        if len(self.warning_windows) != 0:
-            del self.warning_windows[-1]
-
-        self.main_window.update(self.state)
-
     def check_status(self, state):
-        warnings = []
-
-        for extractor in self.info_extractors:
-            extractor.extract_info(state)
-            extractor.inspect_info()
-            self.state[extractor.name] = extractor.info
-            warnings += extractor.messages
-
-        for warning in warnings:
-            if self.notification_command:
-                os.system(self.notification_command.format(warning)) # FIXME: Highly insecure!
-            self.warning_windows.append(WarningWindow(self.stdscr, warning))
+        for rule in self.rules:
+            rule.check(state)
 
     def main_loop(self):
         UPDATE_INTERVAL = 59

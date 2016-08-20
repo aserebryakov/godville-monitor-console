@@ -16,7 +16,6 @@ class ApplicationStatusWindow(TiledWindow):
                                                       left_window)
 
     def update(self, state):
-        state = state['application_status']
         super(ApplicationStatusWindow, self).update(state)
 
     def init_text_entries(self):

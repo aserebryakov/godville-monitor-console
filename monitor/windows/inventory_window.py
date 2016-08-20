@@ -21,8 +21,7 @@ class InventoryWindow(TiledWindow):
                                               left_window)
 
     def update(self, state):
-        inventory_status = state['inventory_status']
-        super(InventoryWindow, self).update(inventory_status)
+        super(InventoryWindow, self).update(state)
 
     def init_text_entries(self):
         self.text_entries.append(TextEntry('Gold', 'gold_approx', self.width))
