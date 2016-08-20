@@ -1,3 +1,5 @@
+from .text_entry import TextEntry
+from .text_entry import Colors
 import logging
 import curses
 
@@ -28,8 +30,13 @@ class MonitorWindowBase:
         self.window.box()
         self.init_text_entries()
 
-    def add_text_entry(self, entry):
-        self.text_entries.append(entry)
+    def add_text_entry(self, entry, key=None, width=None, color=None):
+        if key is None:
+            self.text_entries.append(entry)
+        else:
+            self.text_entries.append(TextEntry(entry, key,
+                width if width is not None else self.width,
+                color if color is not None else Colors.STANDART))
 
     def update(self, state):
         logging.debug('%s: Updating window \'%s\'',

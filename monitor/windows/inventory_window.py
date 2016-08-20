@@ -19,18 +19,3 @@ class InventoryWindow(TiledWindow):
                                               parent_window,
                                               top_window,
                                               left_window)
-
-    def init_text_entries(self):
-        self.text_entries.append(TextEntry('Gold', 'gold_approx', self.width))
-        self.text_entries.append(TextEntry('Bricks', 'bricks_cnt', self.width))
-        self.text_entries.append(TextEntry('Wood', 'wood_cnt', self.width))
-        self.text_entries.append(TextEntry('Useful Items',
-            lambda state: sum([(1 if 'activate_by_user' in item else 0) for item in state['inventory'].values()]),
-                                            self.width))
-        self.text_entries.append(TextEntry('High Cost Items',
-            lambda state: sum([(1 if item['price'] > 0 else 0) for item in state['inventory'].values()]),
-                                            self.width))
-        self.text_entries.append(TextEntry('Total Items',
-                                           'inventory_num',
-                                            self.width))
-

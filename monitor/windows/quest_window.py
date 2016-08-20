@@ -20,17 +20,3 @@ class QuestWindow(TiledWindow):
                                           top_window,
                                           left_window)
 
-    def init_text_entries(self):
-        self.text_entries.append(TextEntry('', 'quest', self.width))
-        self.text_entries.append(TextEntry('Progress, %',
-                                           'quest_progress',
-                                           self.width))
-
-        self.text_entries.append(TextEntry('',
-                                           '',
-                                           self.width))
-
-        self.text_entries.append(TextEntry('',
-                                           'diary_last',
-                                           self.width))
-
