@@ -1,43 +1,39 @@
 import curses
-from ..core import TiledWindow
+from ..core import MonitorWindowBase
 from ..core import TextEntry
 from ..core import Colors
 
-from .status_window import StatusWindow
-from .quest_window import QuestWindow
-from .pet_window import PetWindow
-from .inventory_window import InventoryWindow
-from .application_status_window import ApplicationStatusWindow
-
-
-class MainWindow(TiledWindow):
+class MainWindow(MonitorWindowBase):
     def __init__(self, stdscr):
         (height, width) = stdscr.getmaxyx()
         super(MainWindow, self).__init__('', height, width, stdscr)
 
         self._subwindows = []
 
-        statusWindow    = StatusWindow(self.window)
+        statusWindow = MonitorWindowBase('Status', 10, 22, self.window, 0, 0)
         statusWindow.add_text_entry('', 'name')
         statusWindow.add_text_entry('HP', 'health', color=Colors.HEALTH_POINTS)
         statusWindow.add_text_entry('Max HP', 'max_health', color=Colors.HEALTH_POINTS)
         statusWindow.add_text_entry('Power, %', 'godpower', color=Colors.POWER_POINTS)
         statusWindow.add_text_entry('EXP, %', 'exp_progress')
-
         statusWindow.add_text_entry('Town', 'town_name')
         statusWindow.add_text_entry('Distance', 'distance')
-        questWindow     = QuestWindow(self.window, None, statusWindow)
+        self._subwindows.append(statusWindow)
+
+        questWindow = MonitorWindowBase('Quest', 8, width - 22, self.window, 0, 22)
         questWindow.add_text_entry('', 'quest')
         questWindow.add_text_entry('Progress, %', 'quest_progress')
         questWindow.add_text_entry('', '')
         questWindow.add_text_entry('', 'diary_last')
-        petWindow       = PetWindow(self.window, statusWindow, None)
+        self._subwindows.append(questWindow)
+
+        petWindow = MonitorWindowBase('Pet', 6, 22, self.window, 10, 0)
         petWindow.add_text_entry('', lambda state: state['pet']['pet_class'])
         petWindow.add_text_entry('', lambda state: state['pet']['pet_name'])
         petWindow.add_text_entry('Level', lambda state: state['pet']['pet_level'])
-        inventoryWindow = InventoryWindow(self.window,
-                                          questWindow,
-                                          statusWindow)
+        self._subwindows.append(petWindow)
+
+        inventoryWindow = MonitorWindowBase('Inventory', 8, width - 22, self.window, 8, 22)
         inventoryWindow.add_text_entry('Gold', 'gold_approx')
         inventoryWindow.add_text_entry('Bricks', 'bricks_cnt')
         inventoryWindow.add_text_entry('Wood', 'wood_cnt')
@@ -46,17 +42,11 @@ class MainWindow(TiledWindow):
         inventoryWindow.add_text_entry('High Cost Items',
             lambda state: sum([(1 if item['price'] > 0 else 0) for item in state['inventory'].values()]))
         inventoryWindow.add_text_entry('Total Items', 'inventory_num')
+        self._subwindows.append(inventoryWindow)
 
-        applicationStatusWindow = ApplicationStatusWindow(self.window,
-                                                          petWindow,
-                                                          None)
+        applicationStatusWindow = MonitorWindowBase('Application Status', height - 16, width, self.window, 16, 0)
         applicationStatusWindow.add_text_entry('',
             lambda state: 'Session is expired' if 'expired' in state else 'Session is active')
-
-        self._subwindows.append(statusWindow)
-        self._subwindows.append(questWindow)
-        self._subwindows.append(petWindow)
-        self._subwindows.append(inventoryWindow)
         self._subwindows.append(applicationStatusWindow)
 
     def update(self, state):
