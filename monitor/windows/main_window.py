@@ -3,6 +3,13 @@ from ..core import MonitorWindowBase
 from ..core import TextEntry
 from ..core import Colors
 
+def item_priority(item):
+    if 'activate_by_user' in item and item['activate_by_user']:
+        return 2
+    if item['price'] > 0:
+        return 1
+    return 0
+
 def inventory_list(state):
     item_list = []
     for item_name in state['inventory']:
@@ -10,8 +17,17 @@ def inventory_list(state):
         item_state['name'] = item_name
         item_list.append(item_state)
     item_list.sort(key=lambda item: item['pos'])
+    item_list.sort(key=item_priority, reverse=True)
     for item in item_list:
-        yield '- {0}'.format(item['name']), None
+        color = None
+        if 'activate_by_user' in item and item['activate_by_user']:
+            color = Colors.POWER_POINTS
+        elif item['price'] > 0:
+            color = Colors.MONEY
+        if item['cnt'] > 1:
+            yield '- {0} (x{1})'.format(item['name'], item['cnt']), color
+        else:
+            yield '- {0}'.format(item['name']), color
 
 class MainWindow(MonitorWindowBase):
     def __init__(self, stdscr):

@@ -65,11 +65,17 @@ class MonitorWindowBase:
 
     def write_text_chunks(self, chunks, color, start_line):
         for i, chunk in enumerate(chunks):
-            self.window.addnstr(start_line + i,
-                                1,
-                                chunk,
-                                self.width - 2,
-                                curses.color_pair(color))
+            try:
+                self.window.addnstr(start_line + i,
+                                    1,
+                                    chunk,
+                                    self.width - 2,
+                                    curses.color_pair(color))
+            except curses.error as e:
+                if 'addnwstr() returned ERR' in str(e):
+                    self.window.box()
+                    self.window.addstr(0, 2, self.title)
+                    self.window.addnstr(self.height - 2, self.width - 7, '[...]', 5, curses.color_pair(Colors.ATTENTION))
 
 
     def write_text(self, entries):

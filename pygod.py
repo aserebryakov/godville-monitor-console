@@ -83,6 +83,9 @@ class Monitor:
         curses.init_pair(Colors.ATTENTION,
                          curses.COLOR_WHITE,
                          curses.COLOR_RED)
+        curses.init_pair(Colors.MONEY,
+                         curses.COLOR_YELLOW,
+                         curses.COLOR_BLACK)
 
     def post_warning(self, warning_message):
         if self.quiet:
