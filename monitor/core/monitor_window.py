@@ -1,4 +1,5 @@
 from .text_entry import TextEntry
+from .text_entry import ListEntry
 from .text_entry import Colors
 import logging
 import curses
@@ -33,6 +34,11 @@ class MonitorWindowBase:
             self.text_entries.append(TextEntry(entry, key,
                 width if width is not None else self.width,
                 color if color is not None else Colors.STANDART))
+
+    def add_list_entry(self, list_generator, width=None, color=None):
+        self.text_entries.append(ListEntry(list_generator,
+            width if width is not None else self.width,
+            color if color is not None else Colors.STANDART))
 
     def update(self, state):
         logging.debug('%s: Updating window \'%s\'',
@@ -70,10 +76,16 @@ class MonitorWindowBase:
         offset = 1 # Offset for correcting line number for splitted text
 
         for i, entry in enumerate(entries):
-            logging.debug('%s: Writting text \'%s\'',
-                          self.write_text.__name__,
-                          entry.text)
-
-            chunks = self.split_text(entry.text, self.width - 2)
-            self.write_text_chunks(chunks, entry.color, i + offset)
-            offset += len(chunks) - 1
+            if isinstance(entry.text, str):
+                logging.debug('%s: Writting text \'%s\'',
+                              self.write_text.__name__,
+                              entry.text)
+                chunks = self.split_text(entry.text, self.width - 2)
+                self.write_text_chunks(chunks, entry.color, i + offset)
+                offset += len(chunks) - 1
+            else:
+                for line, color in entry.text:
+                    chunks = self.split_text(line, self.width - 2)
+                    self.write_text_chunks(chunks, color, i + offset)
+                    offset += len(chunks) - 1
+                    offset += 1

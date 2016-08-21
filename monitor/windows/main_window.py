@@ -3,6 +3,16 @@ from ..core import MonitorWindowBase
 from ..core import TextEntry
 from ..core import Colors
 
+def inventory_list(state):
+    item_list = []
+    for item_name in state['inventory']:
+        item_state = state['inventory'][item_name]
+        item_state['name'] = item_name
+        item_list.append(item_state)
+    item_list.sort(key=lambda item: item['pos'])
+    for item in item_list:
+        yield '- {0}'.format(item['name']), None
+
 class MainWindow(MonitorWindowBase):
     def __init__(self, stdscr):
         (height, width) = stdscr.getmaxyx()
@@ -48,6 +58,7 @@ class MainWindow(MonitorWindowBase):
             lambda state: sum([(1 if 'activate_by_user' in item else 0) for item in state['inventory'].values()]))
         wnd.add_text_entry('High Cost Items',
             lambda state: sum([(1 if item['price'] > 0 else 0) for item in state['inventory'].values()]))
+        wnd.add_list_entry(inventory_list)
         self._subwindows.append(wnd)
 
         # Column 3: Quest, diary etc.

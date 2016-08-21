@@ -54,3 +54,17 @@ class TextEntry:
                                         custom_text,
                                         key_width)
 
+class ListEntry:
+    def __init__(self, list_generator, width, color = Colors.STANDART):
+        self.generator = list_generator
+        self.width           = width
+        self.color           = color
+        self.text            = []
+
+    def update(self, state):
+        self.text = []
+        for item, color in self.generator(state):
+            if color is None:
+                color = Colors.STANDART
+            self.text.append( (item, color) )
+

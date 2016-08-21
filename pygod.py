@@ -29,6 +29,7 @@ class Monitor:
         self.dump_file = args.state
         self.state = {}
         self.notification_command = args.notification_command
+        self.quiet = args.quiet
         self.browser = args.browser if args.browser else "x-www-browser"
         self.rules = []
 
@@ -43,7 +44,7 @@ class Monitor:
         self.init_keys()
         self.init_status_checkers()
 
-    def __del__(self):
+    def finalize(self):
         curses.echo()
         try:
             curses.nocbreak()
@@ -84,6 +85,8 @@ class Monitor:
                          curses.COLOR_RED)
 
     def post_warning(self, warning_message):
+        if self.quiet:
+            return
         if self.notification_command:
             os.system(self.notification_command.format(warning_message)) # FIXME: Highly insecure!
         self.warning_windows.append(WarningWindow(self.stdscr, warning_message))
@@ -229,6 +232,11 @@ def main():
                         '--dump',
                         action = 'store_true',
                         help = 'dump state to file and exit (debug option)')
+    parser.add_argument('-q',
+                        '--quiet',
+                        action = 'store_true',
+                        default=False,
+                        help = 'do not show notifications')
 
     parser.add_argument('-D',
                         '--debug',
@@ -287,8 +295,11 @@ def main():
             f.write(prettified_state.encode('utf-8'))
         print('Dumped current state to {0}.'.format(dump_file))
     else:
-        monitor = Monitor(args)
-        monitor.main_loop()
+        try:
+            monitor = Monitor(args)
+            monitor.main_loop()
+        finally:
+            monitor.finalize()
 
 
 if __name__ == '__main__':
