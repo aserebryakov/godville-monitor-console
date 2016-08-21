@@ -2,6 +2,7 @@ from .text_entry import TextEntry
 from .text_entry import Colors
 import logging
 import curses
+import textwrap
 
 class MonitorWindowBase:
     '''
@@ -52,15 +53,9 @@ class MonitorWindowBase:
         pass
 
     def split_text(self, text, length):
-        chunks = []
-
-        if len(text) == 0:
-            chunks.append('')
-
-        for i in range(0, len(text), length):
-            chunks.append(text[i:i + length])
-
-        return chunks
+        if not text:
+            return ['']
+        return textwrap.wrap(text, length)
 
     def write_text_chunks(self, chunks, color, start_line):
         for i, chunk in enumerate(chunks):
