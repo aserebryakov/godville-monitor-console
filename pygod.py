@@ -31,6 +31,8 @@ class Monitor:
         self.notification_command = args.notification_command
         self.quiet = args.quiet
         self.browser = args.browser if args.browser else "x-www-browser"
+        self.refresh_command = args.refresh_command
+        self.autorefresh = args.autorefresh
         self.rules = []
 
         curses.noecho()
@@ -56,6 +58,7 @@ class Monitor:
     def init_keys(self):
         self.controls['q'] = self.quit
         self.controls['f'] = self.open_browser
+        self.controls['F'] = self.refresh_session
         self.controls[' '] = self.remove_warning
 
     def init_windows(self):
@@ -103,7 +106,7 @@ class Monitor:
     def init_status_checkers(self):
         self.rules.append(Rule(
             lambda info: 'expired' in info and info['expired'],
-            lambda: self.post_warning('Session is expired. Please reconnect.')
+            lambda: self.refresh_session() if self.autorefresh else self.post_warning('Session is expired. Please reconnect.')
             ))
         self.rules.append(Rule(
             lambda info: 'health' in info and info['health'] < 40,
@@ -171,6 +174,10 @@ class Monitor:
 
     def open_browser(self):
         os.system("{0} http://godville.net/superhero".format(self.browser)) # FIXME also unsafe!
+
+    def refresh_session(self):
+        if self.refresh_command:
+            os.system(self.refresh_command) # FIXME also unsafe!
 
     def check_status(self, state):
         for rule in self.rules:
@@ -265,6 +272,12 @@ def main():
     args.browser = None
     if 'main' in settings and 'browser' in settings['main']:
         args.browser = unquote_string(settings.get('main', 'browser'))
+    args.autorefresh = False
+    if 'main' in settings and 'autorefresh' in settings['main']:
+        args.autorefresh = unquote_string(settings.get('main', 'autorefresh')).lower() == "true"
+    args.refresh_command = None
+    if 'main' in settings and 'refresh_command' in settings['main']:
+        args.refresh_command = unquote_string(settings.get('main', 'refresh_command'))
 
     # Configuring logs
     log_level = logging.WARNING
