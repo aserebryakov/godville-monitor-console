@@ -28,12 +28,7 @@ class WarningWindow(MonitorWindowBase):
             x = 0
             y = 0
 
-        super(WarningWindow, self).__init__('Warning',
-                                            height,
-                                            width,
-                                            parent_window,
-                                            y,
-                                            x)
+        super(WarningWindow, self).__init__(parent_window, 'Warning', x, y, width, height)
 
         self.window.bkgd(' ', curses.color_pair(Colors.ATTENTION))
 

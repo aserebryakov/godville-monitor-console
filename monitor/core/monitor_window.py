@@ -8,21 +8,16 @@ class MonitorWindowBase:
     Base class for all windows of the Godville Monitor
 
     '''
-    def __init__(self,
-                 title,
-                 height,
-                 width,
-                 parent_window,
-                 y = 0,
-                 x = 0):
-
+    def __init__(self, parent_window, title, x=0, y=0, width=None, height=None):
         self.title        = title
         self.text_entries = []
 
-        self.height      = height
-        self.width       = width
+        parent_height, parent_width = parent_window.getmaxyx()
+
         self.x           = x
         self.y           = y
+        self.width       = width if width else parent_width - x
+        self.height      = height if height else parent_height - y
         self.window      = parent_window.subwin(self.height,
                                                  self.width,
                                                  self.y,
