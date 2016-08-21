@@ -177,7 +177,7 @@ class Monitor:
             rule.check(state)
 
     def main_loop(self):
-        UPDATE_INTERVAL = 59
+        UPDATE_INTERVAL = 61
         last_update_time = time.time()
 
         self.state = json.loads(self.read_state())

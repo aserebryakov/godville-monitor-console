@@ -2,6 +2,7 @@ import curses
 from ..core import MonitorWindowBase
 from ..core import TextEntry
 from ..core import Colors
+import datetime
 
 def item_priority(item):
     if 'activate_by_user' in item and item['activate_by_user']:
@@ -28,6 +29,15 @@ def inventory_list(state):
             yield '- {0} (x{1})'.format(item['name'], item['cnt']), color
         else:
             yield '- {0}'.format(item['name']), color
+
+DIARY_EVENTS = [] # (timestamp, text)
+def diary_events(state):
+    global DIARY_EVENTS
+    last_entry = state['diary_last']
+    if not DIARY_EVENTS or last_entry != DIARY_EVENTS[0][1]:
+        DIARY_EVENTS.insert(0, (datetime.datetime.now(), last_entry))
+    DIARY_EVENTS = DIARY_EVENTS[:10]
+    return [('{0}  {1}'.format(timestamp.strftime('%H:%M'), entry), None) for (timestamp, entry) in DIARY_EVENTS]
 
 class MainWindow(MonitorWindowBase):
     def __init__(self, stdscr):
@@ -70,10 +80,6 @@ class MainWindow(MonitorWindowBase):
         wnd = MonitorWindowBase(self.window, 'Inventory', 22, 0, 30, None)
         wnd.add_text_entry('Gold:', 'gold_approx')
         wnd.add_text_entry('Items:', lambda state: '{0}/{1}'.format(state['inventory_num'], state['inventory_max_num']))
-        wnd.add_text_entry('Useful Items',
-            lambda state: sum([(1 if 'activate_by_user' in item else 0) for item in state['inventory'].values()]))
-        wnd.add_text_entry('High Cost Items',
-            lambda state: sum([(1 if item['price'] > 0 else 0) for item in state['inventory'].values()]))
         wnd.add_list_entry(inventory_list)
         self._subwindows.append(wnd)
 
@@ -83,7 +89,7 @@ class MainWindow(MonitorWindowBase):
         wnd.add_text_entry('', '')
         wnd.add_text_entry('', lambda state: '"{0}"'.format(state['motto']))
         wnd.add_text_entry('', lambda x: '* * *')
-        wnd.add_text_entry('- ', 'diary_last')
+        wnd.add_list_entry(diary_events)
         self._subwindows.append(wnd)
 
     def update(self, state):
