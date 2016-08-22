@@ -113,6 +113,10 @@ class Monitor:
             lambda: self.post_warning('Low Health')
             ))
         self.rules.append(Rule(
+            lambda info: info['temple_completed_at'] and (info['health'] > 0.66 * info['max_health']) and info['godpower'] == 100,
+            lambda: self.post_warning('Ready for dungeon')
+            ))
+        self.rules.append(Rule(
             lambda info: 'arena_fight' in info and info['arena_fight'],
             lambda: self.post_warning('Hero is in fight')
             ))
