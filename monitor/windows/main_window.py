@@ -39,6 +39,17 @@ def diary_events(state):
     DIARY_EVENTS = DIARY_EVENTS[:10]
     return [('{0}  {1}'.format(timestamp.strftime('%H:%M'), entry), None) for (timestamp, entry) in DIARY_EVENTS]
 
+def hero_location(state):
+    if 'arena_fight' in state and state['arena_fight']:
+        if 'fight_type' in state:
+            return state['fight_type']
+        else:
+            return 'Fight!'
+    else:
+        if 'town_name' in state and state['town_name']:
+            return state['town_name']
+    return '{0} pl'.format(state['distance'])
+
 class MainWindow(MonitorWindowBase):
     def __init__(self, stdscr):
         (height, width) = stdscr.getmaxyx()
@@ -64,7 +75,7 @@ class MainWindow(MonitorWindowBase):
         wnd.add_text_entry('Clan:', lambda state: '{0}, {1}'.format(state['clan'], state['clan_position']))
         wnd.add_text_entry('Temple:', lambda state: 'done' if state['temple_completed_at'] else str(state['bricks_cnt']))
         wnd.add_text_entry('Ark:', lambda state: 'done' if state['ark_completed_at'] else str(state['wood_cnt']))
-        wnd.add_text_entry('Location:', lambda state: 'Fight!' if state['arena_fight'] else ( state['town_name'] if state['town_name'] else '{0} pl'.format(state['distance']) ) )
+        wnd.add_text_entry('Location:', hero_location)
         self._subwindows.append(wnd)
 
         wnd = MonitorWindowBase(self.window, 'Pet', 0, 19, 22, 5)

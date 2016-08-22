@@ -117,8 +117,12 @@ class Monitor:
             lambda: self.post_warning('Ready for dungeon')
             ))
         self.rules.append(Rule(
-            lambda info: 'arena_fight' in info and info['arena_fight'],
+            lambda info: 'arena_fight' in info and info['arena_fight'] and info['fight_type'] != 'dungeon',
             lambda: self.post_warning('Hero is in fight')
+            ))
+        self.rules.append(Rule(
+            lambda info: 'arena_fight' in info and info['arena_fight'] and info['fight_type'] == 'dungeon',
+            lambda: self.post_warning('Hero descended into dungeon!')
             ))
         self.rules.append(Rule(
             lambda info: sum([(1 if 'activate_by_user' in item else 0) for item in info['inventory'].values()]) > 0,
