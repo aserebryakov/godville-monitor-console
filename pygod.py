@@ -7,6 +7,7 @@ import json
 import curses
 import logging
 import configparser
+import subprocess
 from urllib.request import urlopen
 from urllib.parse import quote_plus
 
@@ -181,11 +182,11 @@ class Monitor:
         sys.exit(0)
 
     def open_browser(self):
-        os.system("{0} http://godville.net/superhero".format(self.browser)) # FIXME also unsafe!
+        subprocess.Popen("{0} http://godville.net/superhero".format(self.browser), shell=True, stderr=subprocess.DEVNULL) # FIXME also unsafe!
 
     def refresh_session(self):
         if self.refresh_command:
-            os.system(self.refresh_command) # FIXME also unsafe!
+            subprocess.Popen(self.refresh_command, shell=True, stderr=subprocess.DEVNULL) # FIXME also unsafe!
 
     def check_status(self, state):
         for rule in self.rules:
