@@ -34,6 +34,7 @@ class Monitor:
         self.browser = args.browser if args.browser else "x-www-browser"
         self.refresh_command = args.refresh_command
         self.autorefresh = args.autorefresh
+        self.open_browser_on_start = args.open_browser_on_start
         self.rules = []
 
         curses.noecho()
@@ -104,14 +105,31 @@ class Monitor:
 
         self.main_window.update(self.state)
 
+    def handle_expired_session(self):
+        if self.autorefresh:
+            if self.expired_on_start:
+                self.expired_on_start = False
+                if self.open_browser_on_start:
+                    self.open_browser()
+                else:
+                    self.refresh_session()
+            else:
+                self.refresh_session()
+        else:
+            self.post_warning('Session is expired. Please reconnect.')
+
     def init_status_checkers(self):
         self.rules.append(Rule(
             lambda info: 'expired' in info and info['expired'],
             lambda: self.refresh_session() if self.autorefresh else self.post_warning('Session is expired. Please reconnect.')
             ))
         self.rules.append(Rule(
-            lambda info: 'health' in info and info['health'] < 40,
+            lambda info: 'health' in info and info['health'] > 0 and info['health'] < 40,
             lambda: self.post_warning('Low Health')
+            ))
+        self.rules.append(Rule(
+            lambda info: 'health' in info and info['health'] == 0,
+            lambda: self.post_warning('Hero died')
             ))
         self.rules.append(Rule(
             lambda info: info['temple_completed_at'] and (info['health'] > 0.66 * info['max_health']) and info['godpower'] == 100,
@@ -182,11 +200,11 @@ class Monitor:
         sys.exit(0)
 
     def open_browser(self):
-        subprocess.Popen("{0} http://godville.net/superhero".format(self.browser), shell=True, stderr=subprocess.DEVNULL) # FIXME also unsafe!
+        subprocess.Popen("{0} http://godville.net/superhero".format(self.browser), shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) # FIXME also unsafe!
 
     def refresh_session(self):
         if self.refresh_command:
-            subprocess.Popen(self.refresh_command, shell=True, stderr=subprocess.DEVNULL) # FIXME also unsafe!
+            subprocess.Popen(self.refresh_command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) # FIXME also unsafe!
 
     def check_status(self, state):
         for rule in self.rules:
@@ -197,6 +215,7 @@ class Monitor:
         last_update_time = time.time()
 
         self.state = json.loads(self.read_state())
+        self.expired_on_start = 'expired' in self.state and self.state['expired']
         self.check_status(self.state)
         self.main_window.update(self.state)
 
@@ -246,6 +265,11 @@ def main():
                         '--state',
                         type = str,
                         help = 'read state from the dump file (debug option)')
+
+    parser.add_argument('-o',
+                        '--open-browser',
+                        action='store_true', dest='open_browser_on_start',
+                        help = 'opens browser link on start instead of refresh command if session is expired')
 
     parser.add_argument('-d',
                         '--dump',
