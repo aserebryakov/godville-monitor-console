@@ -121,7 +121,7 @@ class Monitor:
     def init_status_checkers(self):
         self.rules.append(Rule(
             lambda info: 'expired' in info and info['expired'],
-            lambda: self.refresh_session() if self.autorefresh else self.post_warning('Session is expired. Please reconnect.')
+            self.handle_expired_session
             ))
         self.rules.append(Rule(
             lambda info: 'health' in info and info['health'] > 0 and info['health'] < 40,
