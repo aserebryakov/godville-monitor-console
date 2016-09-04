@@ -6,8 +6,10 @@ import datetime
 
 def item_priority(item):
     if 'activate_by_user' in item and item['activate_by_user']:
-        return 2
+        return 3
     if item['price'] > 0:
+        return 2
+    if 'type' in item and item['type'] == 'heal_potion':
         return 1
     return 0
 
@@ -23,6 +25,8 @@ def inventory_list(state):
         color = None
         if 'activate_by_user' in item and item['activate_by_user']:
             color = Colors.POWER_POINTS
+        elif 'type' in item and item['type'] == 'heal_potion':
+            color = Colors.HEALING
         elif item['price'] > 0:
             color = Colors.MONEY
         if item['cnt'] > 1:

@@ -6,6 +6,7 @@ class Colors:
     POWER_POINTS    = 3
     ATTENTION       = 4
     MONEY       = 5
+    HEALING       = 6
 
 
 class TextEntry:
