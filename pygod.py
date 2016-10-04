@@ -252,6 +252,14 @@ def get_data_dir(*args):
     os.makedirs(app_data_dir, exist_ok=True)
     return app_data_dir
 
+def get_log_dir():
+    data_dir = os.environ.get('XDG_LOG_HOME')
+    if not data_dir:
+        data_dir = os.path.join(os.path.expanduser("~"), ".local", "log")
+    logdir = os.path.join(data_dir, "pygod")
+    os.makedirs(logdir, exist_ok=True)
+    return logdir
+
 def main():
     # Parsing arguments
     parser = argparse.ArgumentParser()
@@ -322,7 +330,7 @@ def main():
         log_level = logging.DEBUG
 
     logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
-                        filename=os.path.join(get_data_dir(), 'pygod.log'),
+                        filename=os.path.join(get_log_dir(), 'pygod.log'),
                         filemode='a+',
                         level=log_level)
 
