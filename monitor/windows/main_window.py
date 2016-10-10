@@ -83,8 +83,8 @@ class MainWindow(MonitorWindowBase):
         self._subwindows.append(wnd)
 
         wnd = MonitorWindowBase(self.window, 'Pet', 0, 19, 22, 5)
-        wnd.add_text_entry('', lambda state: '{0} {1}'.format(state['pet']['pet_class'], state['pet']['pet_name']))
-        wnd.add_text_entry('Level:', lambda state: state['pet']['pet_level'])
+        wnd.add_text_entry('', lambda state: '{0} {1}'.format(state['pet']['pet_class'], state['pet']['pet_name']) if 'pet' in state else '')
+        wnd.add_text_entry('Level:', lambda state: state['pet']['pet_level'] if 'pet' in state else '-')
         self._subwindows.append(wnd)
 
         if height > 24:
