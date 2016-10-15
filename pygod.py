@@ -76,27 +76,29 @@ class Monitor:
         self.warning_windows = []
 
     def init_colors(self):
+        curses.use_default_colors()
+        COLOR_TRANSPARENT = -1
         curses.init_pair(Colors.STANDART,
                          curses.COLOR_WHITE,
-                         curses.COLOR_BLACK)
+                         COLOR_TRANSPARENT)
 
         curses.init_pair(Colors.HEALTH_POINTS,
                          curses.COLOR_RED,
-                         curses.COLOR_BLACK)
+                         COLOR_TRANSPARENT)
 
         curses.init_pair(Colors.POWER_POINTS,
                          curses.COLOR_BLUE,
-                         curses.COLOR_BLACK)
+                         COLOR_TRANSPARENT)
 
         curses.init_pair(Colors.ATTENTION,
                          curses.COLOR_WHITE,
                          curses.COLOR_RED)
         curses.init_pair(Colors.MONEY,
                          curses.COLOR_YELLOW,
-                         curses.COLOR_BLACK)
+                         COLOR_TRANSPARENT)
         curses.init_pair(Colors.HEALING,
                          curses.COLOR_GREEN,
-                         curses.COLOR_BLACK)
+                         COLOR_TRANSPARENT)
 
     def post_warning(self, warning_message):
         if self.quiet:
