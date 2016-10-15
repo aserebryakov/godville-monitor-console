@@ -54,6 +54,16 @@ def hero_location(state):
             return state['town_name']
     return '{0} pl'.format(state['distance'])
 
+def building_state(state, building_name, item_name, always_show_items=False):
+    done = state['{0}_completed_at'.format(building_name)]
+    item_cnt = '{0}%'.format(state['{0}_cnt'.format(item_name)]/10.0)
+    if done:
+        if always_show_items:
+            return 'done ({0})'.format(item_cnt)
+        else:
+            return 'done'
+    return item_cnt
+
 class MainWindow(MonitorWindowBase):
     def __init__(self, stdscr):
         (height, width) = stdscr.getmaxyx()
@@ -77,8 +87,8 @@ class MainWindow(MonitorWindowBase):
         wnd.add_text_entry('HP:', lambda state: '{0}/{1}'.format(state['health'], state['max_health']), color=Colors.HEALTH_POINTS)
         wnd.add_text_entry('Lvl:', lambda state: '{0} ({1}%)'.format(state['level'], state['exp_progress']))
         wnd.add_text_entry('Clan:', lambda state: '{0}, {1}'.format(state['clan'], state['clan_position']))
-        wnd.add_text_entry('Temple:', lambda state: 'done' if state['temple_completed_at'] else str(state['bricks_cnt']))
-        wnd.add_text_entry('Ark:', lambda state: 'done' if state['ark_completed_at'] else str(state['wood_cnt']))
+        wnd.add_text_entry('Temple:', lambda state: building_state(state, 'temple', 'bricks'))
+        wnd.add_text_entry('Ark:', lambda state: building_state(state, 'ark', 'wood', always_show_items=True))
         wnd.add_text_entry('Location:', hero_location)
         self._subwindows.append(wnd)
 
