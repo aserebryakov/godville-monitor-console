@@ -8,6 +8,7 @@ import curses
 import logging
 import configparser
 import subprocess
+import urllib
 from urllib.request import urlopen
 from urllib.parse import quote_plus
 
@@ -36,6 +37,8 @@ class Monitor:
         self.autorefresh = args.autorefresh
         self.open_browser_on_start = args.open_browser_on_start
         self.rules = []
+        self.prev_state = None
+        self.error = None
 
         curses.noecho()
         try:
@@ -163,14 +166,25 @@ class Monitor:
             else:
                 state = self.read_form_url('http://godville.net/gods/api/{0}.json'
                                            .format(quote_plus(self.godname)))
-        except Exception as e:
+            self.error = None
+        except urllib.error.URLError as e:
             logging.error('%s: reading state error \n %s',
                           self.read_state.__name__,
                           str(e))
+            self.post_warning('Connection error: {0}'.format(e))
+            if self.prev_state is None:
+                print('Error occured, please see the pygod.log')
+                sys.exit(1)
+            state = self.prev_state
+            self.error = str(e)
+        except Exception as e:
+            logging.error('%s: reading state error \n %s %s %s',
+                          self.read_state.__name__,
+                          str(type(e)), repr(e), str(e))
             print('Error occured, please see the pygod.log')
 
-            sys.exit()
-
+            sys.exit(1)
+        self.prev_state = state
         return state
 
     def read_form_url(self, url):
@@ -218,6 +232,8 @@ class Monitor:
         last_update_time = time.time()
 
         self.state = json.loads(self.read_state())
+        if self.error:
+            self.state['error'] = self.error
         self.expired_on_start = 'expired' in self.state and self.state['expired']
         self.check_status(self.state)
         self.main_window.update(self.state)

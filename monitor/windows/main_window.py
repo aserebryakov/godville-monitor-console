@@ -63,7 +63,7 @@ class MainWindow(MonitorWindowBase):
 
         # Column 1: Main hero stats.
         wnd = MonitorWindowBase(self.window, 'Session', 0, 0, 22, 3)
-        wnd.add_text_entry('', lambda state: 'Expired' if 'expired' in state else 'Active')
+        wnd.add_text_entry('', lambda state: ('Expired' if 'expired' in state else 'Active') if 'error' not in state else state['error'])
         self._subwindows.append(wnd)
 
         wnd = MonitorWindowBase(self.window, 'God', 0, 3, 22, 4)
