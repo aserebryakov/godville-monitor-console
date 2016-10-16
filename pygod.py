@@ -17,6 +17,55 @@ from monitor import WarningWindow
 from monitor import MainWindow
 from monitor import Rule
 
+def get_config_file(*args):
+    xdg_config_dir = os.environ.get('XDG_CONFIG_HOME')
+    if not xdg_config_dir:
+        xdg_config_dir = os.path.join(os.path.expanduser("~"), ".config")
+    app_config_dir = os.path.join(xdg_config_dir, "pygod")
+    os.makedirs(app_config_dir, exist_ok=True)
+    return os.path.join(app_config_dir, "pygod.ini")
+
+def get_data_dir(*args):
+    xdg_data_dir = os.environ.get('XDG_DATA_HOME')
+    if not xdg_data_dir:
+        xdg_data_dir = os.path.join(os.path.expanduser("~"), ".local", "share")
+    app_data_dir = os.path.join(xdg_data_dir, "pygod")
+    os.makedirs(app_data_dir, exist_ok=True)
+    return app_data_dir
+
+def get_log_dir():
+    data_dir = os.environ.get('XDG_LOG_HOME')
+    if not data_dir:
+        data_dir = os.path.join(os.path.expanduser("~"), ".local", "log")
+    logdir = os.path.join(data_dir, "pygod")
+    os.makedirs(logdir, exist_ok=True)
+    return logdir
+
+def load_rule_module(module_filename):
+    ''' Loading custom rules (see example rules.py for usage).
+    Custom rules module is loaded from $XDG_DATA_HOME/pygod/rules.py
+    '''
+    if not os.path.isfile(module_filename):
+        return []
+    import types
+    module_name = os.path.splitext(os.path.basename(module_filename))[0]
+    is_function = lambda var: isinstance(var, types.FunctionType)
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(module_name, module_filename)
+        custom_rules_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(custom_rules_module)
+    except AttributeError:
+        from importlib.machinery import SourceFileLoader
+        custom_rules_module = SourceFileLoader(module_name, module_filename).load_module()
+
+    public_objects = [name for name in dir(custom_rules_module) if not name.startswith('_')]
+    return list(filter(is_function, map(custom_rules_module.__dict__.get, public_objects)))
+
+# Basic custom rules.
+CUSTOM_RULE_MODULE = os.path.join(get_data_dir(), "rules.py")
+CUSTOM_RULES = load_rule_module(CUSTOM_RULE_MODULE)
+
 def unquote_string(string):
     if string.startswith('"') and string.endswith('"'):
         string = string[1:-1]
@@ -131,30 +180,12 @@ class Monitor:
             lambda info: 'expired' in info and info['expired'],
             self.handle_expired_session
             ))
-        self.rules.append(Rule(
-            lambda info: 'health' in info and info['health'] > 0 and info['health'] < 40,
-            lambda: self.post_warning('Low Health')
-            ))
-        self.rules.append(Rule(
-            lambda info: 'health' in info and info['health'] == 0,
-            lambda: self.post_warning('Hero died')
-            ))
-        self.rules.append(Rule(
-            lambda info: info['temple_completed_at'] and (info['health'] > 0.66 * info['max_health']) and info['godpower'] == 100,
-            lambda: self.post_warning('Ready for dungeon')
-            ))
-        self.rules.append(Rule(
-            lambda info: 'arena_fight' in info and info['arena_fight'] and info['fight_type'] != 'dungeon',
-            lambda: self.post_warning('Hero is in fight')
-            ))
-        self.rules.append(Rule(
-            lambda info: 'arena_fight' in info and info['arena_fight'] and info['fight_type'] == 'dungeon',
-            lambda: self.post_warning('Hero descended into dungeon!')
-            ))
-        self.rules.append(Rule(
-            lambda info: sum([(1 if 'activate_by_user' in item else 0) for item in info['inventory'].values()]) > 0,
-            lambda: self.post_warning('Hero got an item that can be activated')
-            ))
+        for custom_rule in CUSTOM_RULES:
+            action = custom_rule(None)
+            if isinstance(action, str) or isinstance(action, unicode):
+                # Trick to bind message text at the creation time, not call time.
+                action = lambda action=action: self.post_warning(action)
+            self.rules.append(Rule(custom_rule, action))
 
     def read_state(self):
         logging.debug('%s: reading state',
@@ -252,31 +283,6 @@ class Monitor:
 
             self.handle_key()
             time.sleep(0.1)
-
-
-def get_config_file(*args):
-    xdg_config_dir = os.environ.get('XDG_CONFIG_HOME')
-    if not xdg_config_dir:
-        xdg_config_dir = os.path.join(os.path.expanduser("~"), ".config")
-    app_config_dir = os.path.join(xdg_config_dir, "pygod")
-    os.makedirs(app_config_dir, exist_ok=True)
-    return os.path.join(app_config_dir, "pygod.ini")
-
-def get_data_dir(*args):
-    xdg_data_dir = os.environ.get('XDG_DATA_HOME')
-    if not xdg_data_dir:
-        xdg_data_dir = os.path.join(os.path.expanduser("~"), ".local", "share")
-    app_data_dir = os.path.join(xdg_data_dir, "pygod")
-    os.makedirs(app_data_dir, exist_ok=True)
-    return app_data_dir
-
-def get_log_dir():
-    data_dir = os.environ.get('XDG_LOG_HOME')
-    if not data_dir:
-        data_dir = os.path.join(os.path.expanduser("~"), ".local", "log")
-    logdir = os.path.join(data_dir, "pygod")
-    os.makedirs(logdir, exist_ok=True)
-    return logdir
 
 def main():
     # Parsing arguments
