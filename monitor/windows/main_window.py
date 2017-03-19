@@ -12,7 +12,7 @@ def session_state(state):
         return tr('Token expired')
     if 'expired' in state:
         return tr('Expired')
-    return 'Active'
+    return tr('Active')
 
 def item_priority(item):
     if 'activate_by_user' in item and item['activate_by_user']:
@@ -68,7 +68,7 @@ def hero_location(state):
     else:
         if 'town_name' in state and state['town_name']:
             return state['town_name']
-    return '{0} pl'.format(state['distance'])
+    return tr('{0} pl').format(state['distance'])
 
 def creatures_in_ark(state):
     if 'ark_completed_at' not in state or not state['ark_completed_at']:

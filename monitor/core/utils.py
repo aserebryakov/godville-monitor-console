@@ -34,4 +34,4 @@ def unquote_string(string):
 # I18N
 translate = gettext.translation('pygod', get_data_dir(), fallback=True)
 tr = translate.gettext # this function should be used to mark all translatable strings.
-
+translate.install()

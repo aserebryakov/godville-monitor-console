@@ -11,6 +11,7 @@ import subprocess
 import urllib
 from urllib.request import urlopen
 from urllib.parse import quote_plus
+import gettext
 
 from monitor import Colors
 from monitor import WarningWindow
