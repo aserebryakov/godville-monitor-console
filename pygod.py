@@ -72,17 +72,40 @@ def unquote_string(string):
     # Apparently 'unicode_escape' returns string with corrupted utf-8 encoding.
     return bytes(string, "utf-8").decode('unicode_escape').encode("latin1").decode("utf-8")
 
-def load_hero_state(godname):
-    url = 'http://godville.net/gods/api/{0}'.format(quote_plus(args.god_name))
+def fetch_remote_state(godname, token=None):
+    url = 'http://godville.net/gods/api/{0}'.format(quote_plus(godname))
+    if token:
+        url += '/{0}'.format(token)
     connection = urlopen(url)
     if connection is None or connection.getcode() == 404:
-        old_url = 'http://godville.net/gods/api/{0}.json'.format(quote_plus(args.god_name))
+        old_url = 'http://godville.net/gods/api/{0}.json'.format(quote_plus(godname))
         logging.error(
                 'load_hero_state: new api url %s returned 404\n'
                 '                 will try old api url %s',
                 url, old_url)
         connection = urlopen(old_url)
     return connection.read().decode('utf-8')
+
+def load_hero_state(godname, token=None, filename=None):
+    state = None
+    if filename:
+        with open(filename, 'rb') as f:
+            state = f.read().decode('utf-8')
+    else:
+        state = fetch_remote_state(godname, token)
+    state = json.loads(state)
+    if 'health' not in state:
+        if token:
+            state['token_expired'] = True
+        # Public API only, some keys might be not available.
+        state['health'] = state['max_health']
+        state['exp_progress'] = '...'
+        state['distance'] = '...'
+        state['inventory_num'] = '...'
+        state['quest'] = 'Generate secret token on https://godville.net/user/profile'
+        state['quest_progress'] = '...'
+        state['diary_last'] = ''
+    return state
 
 class Monitor:
     def __init__(self, args):
@@ -97,6 +120,7 @@ class Monitor:
         self.refresh_command = args.refresh_command
         self.autorefresh = args.autorefresh
         self.open_browser_on_start = args.open_browser_on_start
+        self.token = args.token
         self.rules = []
         self.prev_state = None
         self.error = None
@@ -209,7 +233,7 @@ class Monitor:
             if self.dump_file != None:
                 state = self.read_dump(self.dump_file)
             else:
-                state = load_hero_state(self.godname)
+                state = load_hero_state(self.godname, self.token)
             self.error = None
         except urllib.error.URLError as e:
             logging.error('%s: reading state error \n %s',
@@ -228,6 +252,11 @@ class Monitor:
             print('Error occured, please see the pygod.log')
 
             sys.exit(1)
+        if 'token_expired' in state:
+            self.post_warning('Token is expired.\n'
+                    'Visit user profile page to generate a new one:\n'
+                    'https://godville.net/user/profile'
+                    )
         self.prev_state = state
         return state
 
@@ -235,8 +264,7 @@ class Monitor:
         state = None
 
         try:
-            with open(dumpfile, 'rb') as f:
-                state = f.read().decode('utf-8')
+            state = load_hero_state(self.godname, filename=dumpfile)
         except IOError:
             logging.error('%s: Error reading file %s',
                           self.read_dump.__name__,
@@ -271,7 +299,7 @@ class Monitor:
         UPDATE_INTERVAL = 61
         last_update_time = time.time()
 
-        self.state = json.loads(self.read_state())
+        self.state = self.read_state()
         if self.error:
             self.state['error'] = self.error
         self.expired_on_start = 'expired' in self.state and self.state['expired']
@@ -281,7 +309,7 @@ class Monitor:
         while(True):
             if last_update_time + UPDATE_INTERVAL < time.time():
                 last_update_time = time.time()
-                self.state = json.loads(self.read_state())
+                self.state = self.read_state()
                 self.check_status(self.state)
                 self.main_window.update(self.state)
 
@@ -353,6 +381,9 @@ def main():
     args.refresh_command = None
     if 'main' in settings and 'refresh_command' in settings['main']:
         args.refresh_command = unquote_string(settings.get('main', 'refresh_command'))
+    args.token = None
+    if 'auth' in settings and 'token' in settings['auth']:
+        args.token = unquote_string(settings.get('auth', 'token'))
 
     # Configuring logs
     log_level = logging.WARNING
@@ -372,13 +403,8 @@ def main():
     logging.debug('Starting PyGod with username %s', args.god_name)
 
     if args.dump:
-        state = None
-        if args.state:
-            with open(args.state, 'rb') as f:
-                state = f.read().decode('utf-8')
-        else:
-            state = load_hero_state(args.god_name)
-        prettified_state = json.dumps(json.loads(state), indent=4, ensure_ascii=False)
+        state = load_hero_state(args.god_name, args.token, filename=args.state)
+        prettified_state = json.dumps(state, indent=4, ensure_ascii=False)
         dump_file = '{0}.json'.format(args.god_name)
         with open(dump_file, 'wb') as f:
             f.write(prettified_state.encode('utf-8'))

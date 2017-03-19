@@ -4,6 +4,15 @@ from ..core import TextEntry
 from ..core import Colors
 import datetime
 
+def session_state(state):
+    if 'error' in state:
+        return state['error']
+    if 'token_expired' in state:
+        return 'Token expired'
+    if 'expired' in state:
+        return 'Expired'
+    return 'Active'
+
 def item_priority(item):
     if 'activate_by_user' in item and item['activate_by_user']:
         return 3
@@ -15,7 +24,11 @@ def item_priority(item):
 
 def inventory_list(state):
     # New api replaced inventory with 'activatables' list.
-    inventory = state['activatables'] if 'activatables' in state else state['inventory']
+    if 'activatables' in state:
+        for item in state['activatables']:
+            yield repr(item) # FIXME: whats the format of activatable item?
+        return
+    inventory = state['inventory']
     item_list = []
     for item_name in inventory:
         item_state = inventory[item_name]
@@ -90,7 +103,7 @@ class MainWindow(MonitorWindowBase):
         # Column 1: Main hero stats.
         windows = [
                 ('Session', [
-                    ('', lambda state: ('Expired' if 'expired' in state else 'Active') if 'error' not in state else state['error']),
+                    ('', session_state),
                     ]),
                 ('God', [
                     ('', 'godname'),
