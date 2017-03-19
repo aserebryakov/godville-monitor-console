@@ -17,30 +17,7 @@ from monitor import Colors
 from monitor import WarningWindow
 from monitor import MainWindow
 from monitor import Rule
-
-def get_config_file(*args):
-    xdg_config_dir = os.environ.get('XDG_CONFIG_HOME')
-    if not xdg_config_dir:
-        xdg_config_dir = os.path.join(os.path.expanduser("~"), ".config")
-    app_config_dir = os.path.join(xdg_config_dir, "pygod")
-    os.makedirs(app_config_dir, exist_ok=True)
-    return os.path.join(app_config_dir, "pygod.ini")
-
-def get_data_dir(*args):
-    xdg_data_dir = os.environ.get('XDG_DATA_HOME')
-    if not xdg_data_dir:
-        xdg_data_dir = os.path.join(os.path.expanduser("~"), ".local", "share")
-    app_data_dir = os.path.join(xdg_data_dir, "pygod")
-    os.makedirs(app_data_dir, exist_ok=True)
-    return app_data_dir
-
-def get_log_dir():
-    data_dir = os.environ.get('XDG_LOG_HOME')
-    if not data_dir:
-        data_dir = os.path.join(os.path.expanduser("~"), ".local", "log")
-    logdir = os.path.join(data_dir, "pygod")
-    os.makedirs(logdir, exist_ok=True)
-    return logdir
+from monitor import utils
 
 def load_rule_module(module_filename):
     ''' Loading custom rules (see example rules.py for usage).
@@ -64,14 +41,8 @@ def load_rule_module(module_filename):
     return list(filter(is_function, map(custom_rules_module.__dict__.get, public_objects)))
 
 # Basic custom rules.
-CUSTOM_RULE_MODULE = os.path.join(get_data_dir(), "rules.py")
+CUSTOM_RULE_MODULE = os.path.join(utils.get_data_dir(), "rules.py")
 CUSTOM_RULES = load_rule_module(CUSTOM_RULE_MODULE)
-
-def unquote_string(string):
-    if string.startswith('"') and string.endswith('"'):
-        string = string[1:-1]
-    # Apparently 'unicode_escape' returns string with corrupted utf-8 encoding.
-    return bytes(string, "utf-8").decode('unicode_escape').encode("latin1").decode("utf-8")
 
 def fetch_remote_state(godname, token=None):
     url = 'http://godville.net/gods/api/{0}'.format(quote_plus(godname))
@@ -360,31 +331,31 @@ def main():
     args = parser.parse_args()
 
     # Config.
-    config_files = [get_config_file(), os.path.join(get_data_dir(), "auth.cfg")]
+    config_files = [utils.get_config_file(), os.path.join(utils.get_data_dir(), "auth.cfg")]
     if args.config:
         config_files.append(args.config)
     settings = configparser.SafeConfigParser()
     settings.read(config_files)
     if args.god_name is None:
         if 'auth' in settings and 'god_name' in settings['auth']:
-            args.god_name = unquote_string(settings.get('auth', 'god_name'))
+            args.god_name = utils.unquote_string(settings.get('auth', 'god_name'))
         elif 'main' in settings and 'god_name' in settings['main']:
-            args.god_name = unquote_string(settings.get('main', 'god_name'))
+            args.god_name = utils.unquote_string(settings.get('main', 'god_name'))
     args.notification_command = None
     if 'main' in settings and 'notification_command' in settings['main']:
-        args.notification_command = unquote_string(settings.get('main', 'notification_command'))
+        args.notification_command = utils.unquote_string(settings.get('main', 'notification_command'))
     args.browser = None
     if 'main' in settings and 'browser' in settings['main']:
-        args.browser = unquote_string(settings.get('main', 'browser'))
+        args.browser = utils.unquote_string(settings.get('main', 'browser'))
     args.autorefresh = False
     if 'main' in settings and 'autorefresh' in settings['main']:
-        args.autorefresh = unquote_string(settings.get('main', 'autorefresh')).lower() == "true"
+        args.autorefresh = utils.unquote_string(settings.get('main', 'autorefresh')).lower() == "true"
     args.refresh_command = None
     if 'main' in settings and 'refresh_command' in settings['main']:
-        args.refresh_command = unquote_string(settings.get('main', 'refresh_command'))
+        args.refresh_command = utils.unquote_string(settings.get('main', 'refresh_command'))
     args.token = None
     if 'auth' in settings and 'token' in settings['auth']:
-        args.token = unquote_string(settings.get('auth', 'token'))
+        args.token = utils.unquote_string(settings.get('auth', 'token'))
 
     # Configuring logs
     log_level = logging.WARNING
@@ -393,7 +364,7 @@ def main():
         log_level = logging.DEBUG
 
     logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
-                        filename=os.path.join(get_log_dir(), 'pygod.log'),
+                        filename=os.path.join(utils.get_log_dir(), 'pygod.log'),
                         filemode='a+',
                         level=log_level)
 
