@@ -56,6 +56,11 @@ def hero_location(state):
             return state['town_name']
     return '{0} pl'.format(state['distance'])
 
+def creatures_in_ark(state):
+    if 'ark_completed_at' not in state or not state['ark_completed_at']:
+        return 'N/A'
+    return '{0}m, {1}f'.format(state['ark_m'], state['ark_f'])
+
 def building_state(state, building_name, item_name, always_show_items=False):
     done = state['{0}_completed_at'.format(building_name)]
     item_cnt = '{0}%'.format(state['{0}_cnt'.format(item_name)]/10.0)
@@ -66,6 +71,14 @@ def building_state(state, building_name, item_name, always_show_items=False):
             return 'done'
     return item_cnt
 
+def pet_state(state):
+    if not 'pet' in state:
+        return '-'
+    level = state['pet']['pet_level']
+    if 'wounded' in state['pet']:
+        level += '(hurt)'
+    return level
+
 class MainWindow(MonitorWindowBase):
     def __init__(self, stdscr):
         (height, width) = stdscr.getmaxyx()
@@ -73,6 +86,7 @@ class MainWindow(MonitorWindowBase):
 
         self._subwindows = []
 
+        # TODO: t_level and savings_completed_at
         # Column 1: Main hero stats.
         windows = [
                 ('Session', [
@@ -87,22 +101,25 @@ class MainWindow(MonitorWindowBase):
                     ('', 'alignment'),
                     ('HP:', lambda state: '{0}/{1}'.format(state['health'], state['max_health']), Colors.HEALTH_POINTS),
                     ('Lvl:', lambda state: '{0} ({1}%)'.format(state['level'], state['exp_progress'])),
+                    ('Arena:', lambda state: '{0}/{1}'.format(state['arena_won'], state['arena_lost'])),
                     ('Clan:', lambda state: '{0}, {1}'.format(state['clan'], state['clan_position'])),
+                    (),
                     ('Location:', hero_location),
                     (),
-                    (),
+                    ('Aura:', lambda state: state['aura'] if 'aura' in state else ''),
                     ]),
                 ('Temple', [
                     ('Temple:', lambda state: building_state(state, 'temple', 'bricks')),
-                    ('Savings:', lambda state: state['savings'] if 'savings' in state else 'N/A'),
+                    ('Savings:', lambda state: state['savings'] if 'savings' in state else ''),
                     ]),
                 ('Ark', [
                     ('Ark:', lambda state: building_state(state, 'ark', 'wood', always_show_items=True)),
+                    ('Beasts:', creatures_in_ark),
                     ]),
                 ('Pet', [
                     ('', lambda state: '{0} {1}'.format(state['pet']['pet_class'], state['pet']['pet_name']) if 'pet' in state else ''),
                     (),
-                    ('Level:', lambda state: state['pet']['pet_level'] if 'pet' in state else '-'),
+                    ('Level:', pet_state),
                     ]),
                 ]
 
