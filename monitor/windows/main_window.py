@@ -14,9 +14,11 @@ def item_priority(item):
     return 0
 
 def inventory_list(state):
+    # New api replaced inventory with 'activatables' list.
+    inventory = state['activatables'] if 'activatables' in state else state['inventory']
     item_list = []
-    for item_name in state['inventory']:
-        item_state = state['inventory'][item_name]
+    for item_name in inventory:
+        item_state = inventory[item_name]
         item_state['name'] = item_name
         item_list.append(item_state)
     item_list.sort(key=lambda item: item['pos'])
@@ -72,33 +74,52 @@ class MainWindow(MonitorWindowBase):
         self._subwindows = []
 
         # Column 1: Main hero stats.
-        wnd = MonitorWindowBase(self.window, 'Session', 0, 0, 22, 3)
-        wnd.add_text_entry('', lambda state: ('Expired' if 'expired' in state else 'Active') if 'error' not in state else state['error'])
-        self._subwindows.append(wnd)
+        windows = [
+                ('Session', [
+                    ('', lambda state: ('Expired' if 'expired' in state else 'Active') if 'error' not in state else state['error']),
+                    ]),
+                ('God', [
+                    ('', 'godname'),
+                    ('Power:', 'godpower', Colors.POWER_POINTS),
+                    ]),
+                ('Hero', [
+                    ('', 'name'),
+                    ('', 'alignment'),
+                    ('HP:', lambda state: '{0}/{1}'.format(state['health'], state['max_health']), Colors.HEALTH_POINTS),
+                    ('Lvl:', lambda state: '{0} ({1}%)'.format(state['level'], state['exp_progress'])),
+                    ('Clan:', lambda state: '{0}, {1}'.format(state['clan'], state['clan_position'])),
+                    ('Location:', hero_location),
+                    (),
+                    (),
+                    ]),
+                ('Temple', [
+                    ('Temple:', lambda state: building_state(state, 'temple', 'bricks')),
+                    ('Savings:', lambda state: state['savings'] if 'savings' in state else 'N/A'),
+                    ]),
+                ('Ark', [
+                    ('Ark:', lambda state: building_state(state, 'ark', 'wood', always_show_items=True)),
+                    ]),
+                ('Pet', [
+                    ('', lambda state: '{0} {1}'.format(state['pet']['pet_class'], state['pet']['pet_name']) if 'pet' in state else ''),
+                    (),
+                    ('Level:', lambda state: state['pet']['pet_level'] if 'pet' in state else '-'),
+                    ]),
+                ]
 
-        wnd = MonitorWindowBase(self.window, 'God', 0, 3, 22, 4)
-        wnd.add_text_entry('', 'godname')
-        wnd.add_text_entry('Power:', 'godpower', color=Colors.POWER_POINTS)
-        self._subwindows.append(wnd)
-
-        wnd = MonitorWindowBase(self.window, 'Hero', 0, 7, 22, 12)
-        wnd.add_text_entry('', 'name')
-        wnd.add_text_entry('', 'alignment')
-        wnd.add_text_entry('HP:', lambda state: '{0}/{1}'.format(state['health'], state['max_health']), color=Colors.HEALTH_POINTS)
-        wnd.add_text_entry('Lvl:', lambda state: '{0} ({1}%)'.format(state['level'], state['exp_progress']))
-        wnd.add_text_entry('Clan:', lambda state: '{0}, {1}'.format(state['clan'], state['clan_position']))
-        wnd.add_text_entry('Temple:', lambda state: building_state(state, 'temple', 'bricks'))
-        wnd.add_text_entry('Ark:', lambda state: building_state(state, 'ark', 'wood', always_show_items=True))
-        wnd.add_text_entry('Location:', hero_location)
-        self._subwindows.append(wnd)
-
-        wnd = MonitorWindowBase(self.window, 'Pet', 0, 19, 22, 5)
-        wnd.add_text_entry('', lambda state: '{0} {1}'.format(state['pet']['pet_class'], state['pet']['pet_name']) if 'pet' in state else '')
-        wnd.add_text_entry('Level:', lambda state: state['pet']['pet_level'] if 'pet' in state else '-')
-        self._subwindows.append(wnd)
-
-        if height > 24:
-            wnd = MonitorWindowBase(self.window, '', 0, 24, 22, None)
+        current_column_size = 0
+        for window_name, window_entries in windows:
+            wnd = MonitorWindowBase(self.window, window_name, 0, current_column_size, 22, 2 + len(window_entries))
+            for entry in window_entries:
+                if not entry:
+                    continue # Just a space or placeholder for unexpected events.
+                if len(entry) > 2:
+                    wnd.add_text_entry(entry[0], entry[1], color=entry[2])
+                else:
+                    wnd.add_text_entry(entry[0], entry[1])
+            self._subwindows.append(wnd)
+            current_column_size += 2 + len(window_entries)
+        if height > current_column_size:
+            wnd = MonitorWindowBase(self.window, '', 0, current_column_size, 22, None)
             self._subwindows.append(wnd)
 
         # Column 2: Inventory.
