@@ -3,6 +3,7 @@ import curses
 from .text_entry import TextEntry
 from .text_entry import Colors
 from .monitor_window import MonitorWindowBase
+from gettext import gettext as tr
 
 class WarningWindow(MonitorWindowBase):
     def __init__(self,
@@ -10,7 +11,7 @@ class WarningWindow(MonitorWindowBase):
                  text):
 
         self._text = text
-        self._last_line = 'Press SPACE...'
+        self._last_line = tr('Press SPACE...')
 
         # Include borders to window size
         width  = max(len(self._text), len(self._last_line)) + 2
@@ -28,7 +29,7 @@ class WarningWindow(MonitorWindowBase):
             x = 0
             y = 0
 
-        super(WarningWindow, self).__init__(parent_window, 'Warning', x, y, width, height)
+        super(WarningWindow, self).__init__(parent_window, tr('Warning'), x, y, width, height)
 
         self.window.bkgd(' ', curses.color_pair(Colors.ATTENTION))
 

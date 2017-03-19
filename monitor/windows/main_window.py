@@ -3,14 +3,15 @@ from ..core import MonitorWindowBase
 from ..core import TextEntry
 from ..core import Colors
 import datetime
+from gettext import gettext as tr
 
 def session_state(state):
     if 'error' in state:
         return state['error']
     if 'token_expired' in state:
-        return 'Token expired'
+        return tr('Token expired')
     if 'expired' in state:
-        return 'Expired'
+        return tr('Expired')
     return 'Active'
 
 def item_priority(item):
@@ -63,7 +64,7 @@ def hero_location(state):
         if 'fight_type' in state:
             return state['fight_type']
         else:
-            return 'Fight!'
+            return tr('Fight!')
     else:
         if 'town_name' in state and state['town_name']:
             return state['town_name']
@@ -71,7 +72,7 @@ def hero_location(state):
 
 def creatures_in_ark(state):
     if 'ark_completed_at' not in state or not state['ark_completed_at']:
-        return 'N/A'
+        return '-'
     return '{0}m, {1}f'.format(state['ark_m'], state['ark_f'])
 
 def building_state(state, building_name, item_name, always_show_items=False):
@@ -79,9 +80,9 @@ def building_state(state, building_name, item_name, always_show_items=False):
     item_cnt = '{0}%'.format(state['{0}_cnt'.format(item_name)]/10.0)
     if done:
         if always_show_items:
-            return 'done ({0})'.format(item_cnt)
+            return tr('done ({0})').format(item_cnt)
         else:
-            return 'done'
+            return tr('done')
     return item_cnt
 
 def pet_state(state):
@@ -89,7 +90,7 @@ def pet_state(state):
         return '-'
     level = state['pet']['pet_level']
     if 'wounded' in state['pet']:
-        level += '(hurt)'
+        level += tr('(hurt)')
     return level
 
 class MainWindow(MonitorWindowBase):
@@ -102,37 +103,37 @@ class MainWindow(MonitorWindowBase):
         # TODO: t_level and savings_completed_at
         # Column 1: Main hero stats.
         windows = [
-                ('Session', [
+                (tr('Session'), [
                     ('', session_state),
                     ]),
-                ('God', [
+                (tr('God'), [
                     ('', 'godname'),
-                    ('Power:', 'godpower', Colors.POWER_POINTS),
+                    (tr('Power:'), 'godpower', Colors.POWER_POINTS),
                     ]),
-                ('Hero', [
+                (tr('Hero'), [
                     ('', 'name'),
                     ('', 'alignment'),
-                    ('HP:', lambda state: '{0}/{1}'.format(state['health'], state['max_health']), Colors.HEALTH_POINTS),
-                    ('Lvl:', lambda state: '{0} ({1}%)'.format(state['level'], state['exp_progress'])),
-                    ('Arena:', lambda state: '{0}/{1}'.format(state['arena_won'], state['arena_lost'])),
-                    ('Clan:', lambda state: '{0}, {1}'.format(state['clan'], state['clan_position'])),
+                    (tr('HP:'), lambda state: '{0}/{1}'.format(state['health'], state['max_health']), Colors.HEALTH_POINTS),
+                    (tr('Lvl:'), lambda state: '{0} ({1}%)'.format(state['level'], state['exp_progress'])),
+                    (tr('Arena:'), lambda state: '{0}/{1}'.format(state['arena_won'], state['arena_lost'])),
+                    (tr('Clan:'), lambda state: '{0}, {1}'.format(state['clan'], state['clan_position'])),
                     (),
-                    ('Location:', hero_location),
+                    (tr('Location:'), hero_location),
                     (),
-                    ('Aura:', lambda state: state['aura'] if 'aura' in state else ''),
+                    (tr('Aura:'), lambda state: state['aura'] if 'aura' in state else ''),
                     ]),
-                ('Temple', [
-                    ('Temple:', lambda state: building_state(state, 'temple', 'bricks')),
-                    ('Savings:', lambda state: state['savings'] if 'savings' in state else ''),
+                (tr('Temple'), [
+                    (tr('Temple:'), lambda state: building_state(state, 'temple', 'bricks')),
+                    (tr('Savings:'), lambda state: state['savings'] if 'savings' in state else ''),
                     ]),
-                ('Ark', [
-                    ('Ark:', lambda state: building_state(state, 'ark', 'wood', always_show_items=True)),
-                    ('Beasts:', creatures_in_ark),
+                (tr('Ark'), [
+                    (tr('Ark:'), lambda state: building_state(state, 'ark', 'wood', always_show_items=True)),
+                    (tr('Beasts:'), creatures_in_ark),
                     ]),
-                ('Pet', [
+                (tr('Pet'), [
                     ('', lambda state: '{0} {1}'.format(state['pet']['pet_class'], state['pet']['pet_name']) if 'pet' in state else ''),
                     (),
-                    ('Level:', pet_state),
+                    (tr('Level:'), pet_state),
                     ]),
                 ]
 
@@ -153,15 +154,15 @@ class MainWindow(MonitorWindowBase):
             self._subwindows.append(wnd)
 
         # Column 2: Inventory.
-        wnd = MonitorWindowBase(self.window, 'Inventory', 22, 0, 30, None)
-        wnd.add_text_entry('Gold:', 'gold_approx')
-        wnd.add_text_entry('Items:', lambda state: '{0}/{1}'.format(state['inventory_num'], state['inventory_max_num']))
+        wnd = MonitorWindowBase(self.window, tr('Inventory'), 22, 0, 30, None)
+        wnd.add_text_entry(tr('Gold:'), 'gold_approx')
+        wnd.add_text_entry(tr('Items:'), lambda state: '{0}/{1}'.format(state['inventory_num'], state['inventory_max_num']))
         wnd.add_list_entry(inventory_list)
         self._subwindows.append(wnd)
 
         # Column 3: Quest, diary etc.
-        wnd = MonitorWindowBase(self.window, 'Log', 52, 0, None, None)
-        wnd.add_text_entry('Quest: ', lambda state: '{0} ({1}%)'.format(state['quest'], state['quest_progress']))
+        wnd = MonitorWindowBase(self.window, tr('Log'), 52, 0, None, None)
+        wnd.add_text_entry(tr('Quest: '), lambda state: '{0} ({1}%)'.format(state['quest'], state['quest_progress']))
         wnd.add_text_entry('', '')
         wnd.add_text_entry('', lambda state: '"{0}"'.format(state['motto']))
         wnd.add_text_entry('', lambda x: '* * *')

@@ -9,6 +9,9 @@
 # If string is returned, Monitor.post_warning() will be used as action as the string is used as text of the warning.
 #
 # All exceptions from checks or actions are caught and logged to pygod.log file.
+# 
+# This file is not translated along with the main application as most of the strings here are custom user-defined ones.
+# It should to be translated manually if needed.
 
 def low_health(state):
     if state is None:

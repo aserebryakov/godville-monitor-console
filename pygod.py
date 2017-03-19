@@ -11,6 +11,7 @@ import subprocess
 import urllib
 from urllib.request import urlopen
 from urllib.parse import quote_plus
+from gettext import gettext as tr
 
 from monitor import Colors
 from monitor import WarningWindow
@@ -102,7 +103,7 @@ def load_hero_state(godname, token=None, filename=None):
         state['exp_progress'] = '...'
         state['distance'] = '...'
         state['inventory_num'] = '...'
-        state['quest'] = 'Generate secret token on https://godville.net/user/profile'
+        state['quest'] = tr('Generate secret token on https://godville.net/user/profile')
         state['quest_progress'] = '...'
         state['diary_last'] = ''
     return state
@@ -209,7 +210,7 @@ class Monitor:
             else:
                 self.refresh_session()
         else:
-            self.post_warning('Session is expired. Please reconnect.')
+            self.post_warning(tr('Session is expired. Please reconnect.'))
 
     def init_status_checkers(self):
         self.rules.append(Rule(
@@ -239,9 +240,9 @@ class Monitor:
             logging.error('%s: reading state error \n %s',
                           self.read_state.__name__,
                           str(e))
-            self.post_warning('Connection error: {0}'.format(e))
+            self.post_warning(tr('Connection error: {0}').format(e))
             if self.prev_state is None:
-                print('Error occured, please see the pygod.log')
+                print(tr('Error occured, please see the pygod.log'))
                 sys.exit(1)
             state = self.prev_state
             self.error = str(e)
@@ -249,14 +250,14 @@ class Monitor:
             logging.error('%s: reading state error \n %s %s %s',
                           self.read_state.__name__,
                           str(type(e)), repr(e), str(e))
-            print('Error occured, please see the pygod.log')
+            print(tr('Error occured, please see the pygod.log'))
 
             sys.exit(1)
         if 'token_expired' in state:
-            self.post_warning('Token is expired.\n'
+            self.post_warning(tr('Token is expired.\n'
                     'Visit user profile page to generate a new one:\n'
                     'https://godville.net/user/profile'
-                    )
+                    ))
         self.prev_state = state
         return state
 
@@ -397,7 +398,7 @@ def main():
                         level=log_level)
 
     if args.god_name is None:
-        print('God name must be specified either via command line or using config file!')
+        print(tr('God name must be specified either via command line or using config file!'))
         sys.exit(1)
 
     logging.debug('Starting PyGod with username %s', args.god_name)
@@ -408,7 +409,7 @@ def main():
         dump_file = '{0}.json'.format(args.god_name)
         with open(dump_file, 'wb') as f:
             f.write(prettified_state.encode('utf-8'))
-        print('Dumped current state to {0}.'.format(dump_file))
+        print(tr('Dumped current state to {0}.'.format(dump_file)))
     else:
         try:
             monitor = Monitor(args)

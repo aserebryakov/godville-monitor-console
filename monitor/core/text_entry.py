@@ -1,4 +1,5 @@
 import logging
+from gettext import gettext as tr
 
 class Colors:
     STANDART        = 1
@@ -49,7 +50,7 @@ class TextEntry:
                 custom_text = 'N/A'
 
         if key_width < 0:
-            self.text = '{0} text doesn\'t fit'.format(self.key)
+            self.text = tr("{0} text doesn't fit").format(self.key)
             return
 
         self.text = text_format.format(self.predefined_text,
