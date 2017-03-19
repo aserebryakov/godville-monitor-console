@@ -27,7 +27,7 @@ def inventory_list(state):
     # New api replaced inventory with 'activatables' list.
     if 'activatables' in state:
         for item in state['activatables']:
-            yield repr(item) # FIXME: whats the format of activatable item?
+            yield '- {0}'.format(item), Colors.POWER_POINTS
         return
     inventory = state['inventory']
     item_list = []
