@@ -72,6 +72,18 @@ def unquote_string(string):
     # Apparently 'unicode_escape' returns string with corrupted utf-8 encoding.
     return bytes(string, "utf-8").decode('unicode_escape').encode("latin1").decode("utf-8")
 
+def load_hero_state(godname):
+    url = 'http://godville.net/gods/api/{0}'.format(quote_plus(args.god_name))
+    connection = urlopen(url)
+    if connection is None or connection.getcode() == 404:
+        old_url = 'http://godville.net/gods/api/{0}.json'.format(quote_plus(args.god_name))
+        logging.error(
+                'load_hero_state: new api url %s returned 404\n'
+                '                 will try old api url %s',
+                url, old_url)
+        connection = urlopen(old_url)
+    return connection.read().decode('utf-8')
+
 class Monitor:
     def __init__(self, args):
         self.controls = {}
@@ -195,10 +207,9 @@ class Monitor:
 
         try:
             if self.dump_file != None:
-                state = self.read_dump(self.dump_file).decode('utf-8')
+                state = self.read_dump(self.dump_file)
             else:
-                state = self.read_form_url('http://godville.net/gods/api/{0}.json'
-                                           .format(quote_plus(self.godname)))
+                state = load_hero_state(self.godname)
             self.error = None
         except urllib.error.URLError as e:
             logging.error('%s: reading state error \n %s',
@@ -220,16 +231,12 @@ class Monitor:
         self.prev_state = state
         return state
 
-    def read_form_url(self, url):
-        connection = urlopen(url)
-        return connection.read().decode('utf-8')
-
     def read_dump(self, dumpfile):
         state = None
 
         try:
             with open(dumpfile, 'rb') as f:
-                state = f.read()
+                state = f.read().decode('utf-8')
         except IOError:
             logging.error('%s: Error reading file %s',
                           self.read_dump.__name__,
@@ -370,9 +377,7 @@ def main():
             with open(args.state, 'rb') as f:
                 state = f.read().decode('utf-8')
         else:
-            url = 'http://godville.net/gods/api/{0}.json'.format(quote_plus(args.god_name))
-            connection = urlopen(url)
-            state = connection.read().decode('utf-8')
+            state = load_hero_state(args.god_name)
         prettified_state = json.dumps(json.loads(state), indent=4, ensure_ascii=False)
         dump_file = '{0}.json'.format(args.god_name)
         with open(dump_file, 'wb') as f:
