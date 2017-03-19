@@ -1,4 +1,5 @@
 import os
+import gettext
 
 def get_config_file(*args):
     xdg_config_dir = os.environ.get('XDG_CONFIG_HOME')
@@ -29,3 +30,8 @@ def unquote_string(string):
         string = string[1:-1]
     # Apparently 'unicode_escape' returns string with corrupted utf-8 encoding.
     return bytes(string, "utf-8").decode('unicode_escape').encode("latin1").decode("utf-8")
+
+# I18N
+translate = gettext.translation('pygod', get_data_dir(), fallback=True)
+tr = translate.gettext # this function should be used to mark all translatable strings.
+

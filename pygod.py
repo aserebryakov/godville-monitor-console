@@ -11,13 +11,13 @@ import subprocess
 import urllib
 from urllib.request import urlopen
 from urllib.parse import quote_plus
-from gettext import gettext as tr
 
 from monitor import Colors
 from monitor import WarningWindow
 from monitor import MainWindow
 from monitor import Rule
 from monitor import utils
+from monitor.core.utils import tr
 
 def load_rule_module(module_filename):
     ''' Loading custom rules (see example rules.py for usage).
