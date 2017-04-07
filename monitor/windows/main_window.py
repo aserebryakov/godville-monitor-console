@@ -90,7 +90,7 @@ def pet_state(state):
         return '-'
     level = state['pet']['pet_level']
     if 'wounded' in state['pet']:
-        level += tr('(hurt)')
+        level = str(level) + tr('(hurt)')
     return level
 
 class MainWindow(MonitorWindowBase):
