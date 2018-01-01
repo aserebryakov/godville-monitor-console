@@ -40,6 +40,8 @@ class TextEntry:
 
         if not isinstance(self.key, str):
             custom_text = self.key(state)
+            if custom_text is None:
+                custom_text = tr('N/A')
         elif self.key != '':
             try:
                 custom_text = '{0}'.format(state[self.key])
@@ -47,7 +49,7 @@ class TextEntry:
                 logging.warning('%s: Key not found \'%s\'',
                                 self.update.__name__,
                                 self.key)
-                custom_text = 'N/A'
+                custom_text = tr('N/A')
 
         if key_width < 0:
             self.text = tr("{0} text doesn't fit").format(self.key)
