@@ -1,63 +1,44 @@
+from .text_entry import TextEntry
+from .text_entry import ListEntry
+from .text_entry import Colors
 import logging
 import curses
+import textwrap
 
 class MonitorWindowBase:
     '''
     Base class for all windows of the Godville Monitor
 
     '''
-    def __init__(self,
-                 title,
-                 height,
-                 width,
-                 parent_window,
-                 y = 0,
-                 x = 0):
+    def __init__(self, parent_window, title, x=0, y=0, width=None, height=None):
+        self.title        = title
+        self.text_entries = []
 
-        self._title        = title
-        self._text_entries = []
+        parent_height, parent_width = parent_window.getmaxyx()
 
-        self._height      = height
-        self._width       = width
-        self._x           = x
-        self._y           = y
-        self._window      = parent_window.subwin(self.height,
+        self.x           = x
+        self.y           = y
+        self.width       = width if width else parent_width - x
+        self.height      = height if height else parent_height - y
+        self.window      = parent_window.subwin(self.height,
                                                  self.width,
                                                  self.y,
                                                  self.x)
-        self._window.box()
+        self.window.box()
         self.init_text_entries()
 
-    @property
-    def window(self):
-        return self._window
+    def add_text_entry(self, entry, key=None, width=None, color=None):
+        if key is None:
+            self.text_entries.append(entry)
+        else:
+            self.text_entries.append(TextEntry(entry, key,
+                width if width is not None else self.width,
+                color if color is not None else Colors.STANDART))
 
-    @property
-    def y(self):
-        return self._y
-
-    @property
-    def x(self):
-        return self._x
-
-    @property
-    def height(self):
-        return self._height
-
-    @property
-    def width(self):
-        return self._width
-
-    @property
-    def title(self):
-        return self._title
-
-    @property
-    def text_entries(self):
-        return self._text_entries
-
-    def add_text_entry(self, entry):
-        self.text_entries.append(entry)
+    def add_list_entry(self, list_generator, width=None, color=None):
+        self.text_entries.append(ListEntry(list_generator,
+            width if width is not None else self.width,
+            color if color is not None else Colors.STANDART))
 
     def update(self, state):
         logging.debug('%s: Updating window \'%s\'',
@@ -66,7 +47,7 @@ class MonitorWindowBase:
 
         self.window.erase()
         self.window.box()
-        self._window.addstr(0, 2, self.title)
+        self.window.addstr(0, 2, self.title)
 
         for entry in self.text_entries:
             entry.update(state)
@@ -78,33 +59,39 @@ class MonitorWindowBase:
         pass
 
     def split_text(self, text, length):
-        chunks = []
-
-        if len(text) == 0:
-            chunks.append('')
-
-        for i in range(0, len(text), length):
-            chunks.append(text[i:i + length])
-
-        return chunks
+        if not text:
+            return ['']
+        return textwrap.wrap(text, length)
 
     def write_text_chunks(self, chunks, color, start_line):
         for i, chunk in enumerate(chunks):
-            self._window.addnstr(start_line + i,
-                                1,
-                                chunk,
-                                self.width - 2,
-                                curses.color_pair(color))
+            try:
+                self.window.addnstr(start_line + i,
+                                    1,
+                                    chunk,
+                                    self.width - 2,
+                                    curses.color_pair(color))
+            except curses.error as e:
+                if 'addnwstr() returned ERR' in str(e):
+                    self.window.box()
+                    self.window.addstr(0, 2, self.title)
+                    self.window.addnstr(self.height - 2, self.width - 7, '[...]', 5, curses.color_pair(Colors.ATTENTION))
 
 
     def write_text(self, entries):
         offset = 1 # Offset for correcting line number for splitted text
 
         for i, entry in enumerate(entries):
-            logging.debug('%s: Writting text \'%s\'',
-                          self.write_text.__name__,
-                          entry.text)
-
-            chunks = self.split_text(entry.text, self.width - 2)
-            self.write_text_chunks(chunks, entry.color, i + offset)
-            offset += len(chunks) - 1
+            if isinstance(entry.text, str):
+                logging.debug('%s: Writting text \'%s\'',
+                              self.write_text.__name__,
+                              entry.text)
+                chunks = self.split_text(entry.text, self.width - 2)
+                self.write_text_chunks(chunks, entry.color, i + offset)
+                offset += len(chunks) - 1
+            else:
+                for line, color in entry.text:
+                    chunks = self.split_text(line, self.width - 2)
+                    self.write_text_chunks(chunks, color, i + offset)
+                    offset += len(chunks) - 1
+                    offset += 1
